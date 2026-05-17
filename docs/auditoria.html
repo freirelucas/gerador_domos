@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Auditoria · Gerador de Domos vs Guia Maron 2018</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="wizard-styles.css" />
+<link rel="stylesheet" href="wizard-v3-styles.css" />
+<style>
+  body { padding-bottom: 60px; }
+  .audit-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 48px 64px;
+  }
+  .audit-cover {
+    border: 1px solid var(--ink);
+    background: var(--paper-soft);
+    padding: 56px 60px;
+    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 48px;
+    align-items: end;
+  }
+  .audit-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ocre);
+    margin-bottom: 18px;
+  }
+  .audit-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 18px;
+    max-width: 14ch;
+  }
+  .audit-title em { color: var(--ocre); }
+  .audit-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    letter-spacing: 0.02em;
+  }
+  .audit-stamp {
+    border: 1px dashed var(--ocre);
+    padding: 18px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    background: rgba(180,116,42,0.04);
+  }
+  .audit-stamp .big {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 32px;
+    color: var(--ocre);
+    line-height: 1;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .scorecard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .score {
+    padding: 18px 20px;
+    border: 1px solid var(--ink-faint);
+    background: var(--paper-soft);
+  }
+  .score-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px;
+    font-weight: 500;
+    color: var(--ocre);
+    line-height: 0.95;
+  }
+  .score-num .unit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-left: 4px;
+  }
+  .score-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  /* Findings cards */
+  .find-grid {
+    display: grid;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .find {
+    border: 1px solid var(--ink-faint);
+    background: var(--paper-soft);
+    padding: 0;
+    display: grid;
+    grid-template-columns: 60px 1fr;
+  }
+  .find-side {
+    background: var(--paper);
+    border-right: 1px solid var(--ink-faint);
+    padding: 16px 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+  .find-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: var(--ocre);
+    line-height: 1;
+  }
+  .find-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.2;
+  }
+  .find.severity-alto .find-num,
+  .find.severity-alto .find-tag { color: var(--sangue); }
+  .find.severity-medio .find-num,
+  .find.severity-medio .find-tag { color: var(--ocre); }
+  .find.severity-baixo .find-num,
+  .find.severity-baixo .find-tag { color: var(--verde); }
+  .find-body {
+    padding: 16px 22px 18px;
+    display: grid;
+    gap: 8px;
+  }
+  .find-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .find-title em { color: var(--ocre); }
+  .find-cite {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--ocre);
+    padding: 6px 10px;
+    background: rgba(180,116,42,0.05);
+    line-height: 1.5;
+  }
+  .find-cite em {
+    font-style: italic;
+    color: var(--ink);
+  }
+  .find-impl {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .find-impl strong { color: var(--ocre); }
+  .find-tag-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .find-tag-list span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border: 1px solid var(--ink-faint);
+    padding: 2px 6px;
+    background: var(--paper);
+  }
+
+  /* Tabela comparativa */
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 16px;
+  }
+  table.compare thead th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--ink);
+    background: var(--paper-soft);
+  }
+  table.compare tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px dashed var(--ink-faint);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .status-ok    { color: var(--verde); font-weight: 500; }
+  .status-faltando { color: var(--sangue); font-weight: 500; }
+  .status-parcial  { color: var(--ocre); font-weight: 500; }
+  .check { display: inline-block; width: 12px; height: 12px; border: 1px solid var(--ink-faint); margin-right: 6px; vertical-align: middle; }
+  .check.is-ok { background: var(--verde); border-color: var(--verde); }
+  .check.is-no { background: var(--sangue); border-color: var(--sangue); }
+  .check.is-half { background: linear-gradient(to right, var(--ocre) 50%, transparent 50%); border-color: var(--ocre); }
+
+  /* Roadmap */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .road-col {
+    border: 1px solid var(--ink);
+    background: var(--paper-soft);
+  }
+  .road-head {
+    padding: 14px 18px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .road-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--ocre);
+  }
+  .road-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(247,240,217,0.7);
+    margin-top: 4px;
+  }
+  .road-body {
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .road-body ul { list-style: none; padding: 0; }
+  .road-body li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--ink-faint);
+    position: relative;
+    padding-left: 26px;
+  }
+  .road-body li::before {
+    content: counter(li);
+    counter-increment: li;
+    position: absolute;
+    left: 0; top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ocre);
+    font-weight: 500;
+  }
+  .road-body ul { counter-reset: li; }
+  .road-body li:last-child { border-bottom: none; }
+  .road-body strong { font-weight: 500; color: var(--ink); }
+
+  /* Citação destaque */
+  .pullquote {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 26px 0;
+    margin: 28px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--ink);
+    line-height: 1.4;
+    max-width: 760px;
+  }
+  .pullquote .source {
+    display: block;
+    margin-top: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* TOC */
+  .audit-toc {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    padding: 16px 22px;
+    border: 1px solid var(--ink);
+    background: var(--paper-soft);
+    margin-bottom: 36px;
+  }
+  .audit-toc a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  .audit-toc a:hover { color: var(--ocre); border-bottom-color: var(--ocre); }
+  .audit-toc strong {
+    color: var(--ink); margin-right: 4px;
+    font-weight: 500;
+  }
+
+  @media print {
+    .audit-page { padding: 0; }
+    .audit-cover { page-break-after: always; }
+    .sheet { page-break-inside: avoid; }
+    .find { page-break-inside: avoid; }
+    .road-col { page-break-inside: avoid; }
+  }
+  @media (max-width: 900px) {
+    .audit-cover { grid-template-columns: 1fr; padding: 32px; }
+    .audit-title { font-size: 44px; }
+    .roadmap { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="audit-page">
+
+  <!-- COVER -->
+  <section class="audit-cover">
+    <div>
+      <div class="audit-eyebrow">auditoria técnica · maio 2026</div>
+      <h1 class="audit-title"><em>Gerador de Domos</em> vs. Guia Maron</h1>
+      <div class="audit-sub">
+        Revisão do projeto contra <em>Cúpulas Geodésicas — Guia para Iniciantes</em>
+        (Jorge Maron / Ameríndia, 2018, 70 p.). Foco: inconsistências factuais,
+        lacunas no catálogo de materiais, gaps pedagógicos e oportunidades de UX
+        priorizadas para o público construtor mão-na-massa.
+      </div>
+    </div>
+    <div class="audit-stamp">
+      <span class="big">19</span>
+      achados<br>
+      <span style="color:var(--sangue)">●</span> 4 inconsistências factuais<br>
+      <span style="color:var(--ocre)">●</span> 8 lacunas de catálogo<br>
+      <span style="color:var(--verde)">●</span> 7 oportunidades de UX
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <nav class="audit-toc">
+    <a href="#resumo"><strong>01</strong>resumo executivo</a>
+    <a href="#fact"><strong>02</strong>inconsistências factuais</a>
+    <a href="#materiais"><strong>03</strong>catálogo de materiais</a>
+    <a href="#pedagogia"><strong>04</strong>lacunas pedagógicas</a>
+    <a href="#ux"><strong>05</strong>oportunidades de UX</a>
+    <a href="#citacoes"><strong>06</strong>citações memoráveis</a>
+    <a href="#roadmap"><strong>07</strong>plano de ação</a>
+  </nav>
+
+  <!-- 01 RESUMO -->
+  <section class="sheet" id="resumo">
+    <div class="sheet-head">
+      <div class="sheet-tag">01</div>
+      <h2><em>Resumo</em> executivo</h2>
+      <div class="sheet-meta">veredicto + prioridades</div>
+    </div>
+
+    <div class="memorial">
+      <p>
+        O projeto <strong>está tecnicamente sólido</strong>: geometria geodésica
+        correta (Class I alternate sobre icosaedro), cálculo de cargas conservador
+        baseado em NBR 6123, citação de fontes em todos os preços e dossiê construtivo
+        completo. O fluxo wizard 1→5 é coerente, o canvas 3D v3 com vistas/explodido/sol/animação
+        é um diferencial real para o público construtor.
+      </p>
+      <p>
+        <strong>Mas</strong> há gaps em três frentes: <em>crédito histórico incorreto</em>
+        (atribui implicitamente tudo ao Fuller, omite Bauersfeld/Zeiss 1922), <em>catálogo
+        de materiais incompleto</em> (faltam coberturas históricas como ferrocimento e
+        telhas asfálticas, falta PVC e tubo metálico nas barras, falta o método brasileiro
+        de vigas recíprocas/giro sem hubs) e <em>pedagogia escassa</em> nos benefícios
+        intangíveis que o Maron destaca (vão livre, 30% economia energética, homeostase
+        térmica, acústica, sensação de acolhimento).
+      </p>
+    </div>
+
+    <div class="scorecard">
+      <div class="score">
+        <div class="score-num">82<span class="unit">/100</span></div>
+        <div class="score-label">precisão técnica</div>
+      </div>
+      <div class="score">
+        <div class="score-num">65<span class="unit">/100</span></div>
+        <div class="score-label">cobertura de materiais</div>
+      </div>
+      <div class="score">
+        <div class="score-num">58<span class="unit">/100</span></div>
+        <div class="score-label">pedagogia</div>
+      </div>
+      <div class="score">
+        <div class="score-num">88<span class="unit">/100</span></div>
+        <div class="score-label">UX do fluxo</div>
+      </div>
+      <div class="score">
+        <div class="score-num">72<span class="unit">/100</span></div>
+        <div class="score-label">geral</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 INCONSISTÊNCIAS FACTUAIS -->
+  <section class="sheet" id="fact">
+    <div class="sheet-head">
+      <div class="sheet-tag">02</div>
+      <h2><em>Inconsistências</em> factuais</h2>
+      <div class="sheet-meta">erros ou imprecisões a corrigir</div>
+    </div>
+
+    <div class="find-grid">
+
+      <div class="find severity-alto">
+        <div class="find-side">
+          <div class="find-num">01</div>
+          <div class="find-tag">alto</div>
+          <div class="find-tag">crédito histórico</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">A primeira cúpula geodésica é de <em>1922</em>, não Fuller</div>
+          <div class="find-cite">
+            <em>"Em 1922, Bauersfeld projetou a primeira cúpula geodésica que se tem registro… 16 metros de diâmetro, 3480 barras de metal, frequência 16, cobertura em ferrocimento. Fuller só nomeou em 1948-49 e patenteou em 1954."</em><br>
+            — Maron, 2018, p. 12-13, 16
+          </div>
+          <div class="find-impl">
+            O dossiê do projeto cita Fuller implicitamente (via "geometria Class I" e "icosaedro Class I alternate") mas <strong>não credita Walter Bauersfeld nem a Zeiss</strong>. Para um público brasileiro construtor, perder essa história é perder ancoragem cultural.
+            <strong>Sugestão:</strong> seção "origem" na etapa 5 com timeline 1922 → 1948 → 1954 → Drop City 60s → 300k domos hoje.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 5</span><span>dossiê</span><span>glossário</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">02</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">nomenclatura</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title"><em>"Esfera"</em> ≠ <em>"cúpula"</em> ≠ <em>"domo"</em></div>
+          <div class="find-cite">
+            <em>"As cúpulas completas devem ser chamadas na verdade de 'esfera geodésica', e a designação de 'cúpula geodésica' ou 'domo geodésico' deve ser reservada para cúpulas incompletas (metade ou frações)."</em><br>
+            — Maron, 2018, p. 44
+          </div>
+          <div class="find-impl">
+            No segmented de truncamento, o projeto rotula 1.0 como "esfera". Tecnicamente correto, mas <strong>quando o usuário escolhe esfera completa, não há aviso de que isso vira "esfera geodésica" — não dá pra apoiar no chão</strong>. Vira escultura/balão/maquete. Falta um warning explícito.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 2</span><span>controles</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">03</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">frequência V</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Convenção do <em>v</em> minúsculo</div>
+          <div class="find-cite">
+            <em>"Utiliza-se a letra 'v' para simbolizar a frequência. Portanto 1v é frequência 1; 2v frequência 2 e assim por diante."</em><br>
+            — Maron, 2018, p. 42
+          </div>
+          <div class="find-impl">
+            Projeto usa <strong>V maiúsculo</strong> em todo lugar (UI, dossiê, exports). A literatura geodésica em português (e Maron) prefere o minúsculo. <strong>Impacto baixo</strong> — não é erro, é convenção. Padronizar para minúsculo aumenta familiaridade com bibliografia brasileira.
+          </div>
+          <div class="find-tag-list">
+            <span>todo o app</span><span>tipografia</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-alto">
+        <div class="find-side">
+          <div class="find-num">04</div>
+          <div class="find-tag">alto</div>
+          <div class="find-tag">método brasileiro</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Falta o <em>método "giro" / vigas recíprocas</em> — invenção brasileira</div>
+          <div class="find-cite">
+            <em>"No Brasil, foi desenvolvido pelo LILD (Laboratório de Investigação em Livre Desenho) da PUC Rio, um sistema chamado de 'giro', utilizando um método de 'vigas recíprocas'… geodésicas que dispensam conexões."</em><br>
+            — Maron, 2018, p. 49
+          </div>
+          <div class="find-impl">
+            O catálogo HUB_CONNECTORS tem 5 opções — todas exigem hub. Falta a opção <strong>"sem hub" (vigas recíprocas/giro)</strong>, que é uma inovação brasileira documentada pelo Maron. Para um app brasileiro orientado a DIY, é um buraco notável.
+            <strong>Sugestão:</strong> adicionar como 6ª opção em HUB_CONNECTORS com nota e link para LILD/PUC.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 4</span><span>materials-v2.js</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 03 CATÁLOGO -->
+  <section class="sheet" id="materiais">
+    <div class="sheet-head">
+      <div class="sheet-tag">03</div>
+      <h2><em>Catálogo</em> de materiais</h2>
+      <div class="sheet-meta">o que o guia documenta vs. o que o app oferece</div>
+    </div>
+
+    <h4 style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ocre);margin:14px 0 6px;">barras (estrutura)</h4>
+    <table class="compare">
+      <thead><tr><th style="width:30%">Material no guia</th><th style="width:18%">No app?</th><th>Comentário</th></tr></thead>
+      <tbody>
+        <tr><td>Madeira roliça (eucalipto)</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>eucalipto roliço tratado com fonte (Calipto/Citriodora).</td></tr>
+        <tr><td>Madeira serrada (sarrafo)</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>2 variações de pinus (10cm e 5×2cm). Bem coberto.</td></tr>
+        <tr><td>Bambu</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>Mossô + Dendrocalamus. Excelente — vai além do guia.</td></tr>
+        <tr><td>PVC</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td><strong>Material popular em DIY internacional.</strong> Tubo PVC 50mm é barato (~R$ 18/m) e versátil. Vale adicionar para domos pequenos &lt; 4m, mesmo com aviso de UV.</td></tr>
+        <tr><td>Tubos metálicos (alumínio/aço)</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>Histórico (a primeira de 1922 era em metal). Bom para domos permanentes &gt; 6m. Adicionar Al e aço SCH40.</td></tr>
+        <tr><td>Papelão / cabo de vassoura</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>Experimentais — relevantes para maquete educacional. Podem entrar num "modo aprendiz".</td></tr>
+        <tr><td>Madeira manejada (cumbaru/pequi)</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>Vai além do guia. Boa escolha cerrado.</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ocre);margin:22px 0 6px;">conexões (hubs)</h4>
+    <table class="compare">
+      <thead><tr><th style="width:30%">No guia</th><th style="width:18%">No app?</th><th>Comentário</th></tr></thead>
+      <tbody>
+        <tr><td>Hubs metálicos (estrela / chapa)</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>aço galvanizado a laser.</td></tr>
+        <tr><td>Amarração de corda</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>sisal trançado.</td></tr>
+        <tr><td>Hubs de PVC (pipe-tee)</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>OK.</td></tr>
+        <tr><td>Hubs de madeira (artesanal)</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>O guia destaca como acessível para marceneiros. Adicionar.</td></tr>
+        <tr><td><strong>Sem hub — vigas recíprocas "giro"</strong></td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td><strong>Invenção brasileira do LILD/PUC-Rio.</strong> Faltar essa opção é o gap mais notável do catálogo, especialmente para um app brasileiro.</td></tr>
+        <tr><td>Articulado vs. fixo</td><td><span class="check is-half"></span><span class="status-parcial">parcial</span></td><td>O guia distingue. Projeto não. Adicionar tag em cada hub.</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ocre);margin:22px 0 6px;">coberturas</h4>
+    <table class="compare">
+      <thead><tr><th style="width:30%">No guia</th><th style="width:18%">No app?</th><th>Comentário</th></tr></thead>
+      <tbody>
+        <tr><td>Lonas (PVC / banner reciclado / transparente)</td><td><span class="check is-half"></span><span class="status-parcial">parcial</span></td><td>Lona PVC OK. Falta variação banner reciclado (Drop City style) e lona transparente para estufa.</td></tr>
+        <tr><td>Telhas asfálticas</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>Padrão americano popular. "Uma das últimas grandes novidades tecnológicas". Material acessível no Brasil. <strong>Adicionar.</strong></td></tr>
+        <tr><td>Palhas (buriti, piaçava)</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>Bom — buriti coberto.</td></tr>
+        <tr><td>Ferrocimento</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td><strong>Cobertura histórica original (1922).</strong> Permanente, baixo custo, mas pesada. Não pode faltar.</td></tr>
+        <tr><td>Policarbonato</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>Para estufas e iluminação zenital ampla. Adicionar.</td></tr>
+        <tr><td>Vidro</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>Para "Spaceship Earth" style ou estufas premium.</td></tr>
+        <tr><td>Madeira fenólica / tábua + manta</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>OK (tábua pinus + manta asfáltica).</td></tr>
+        <tr><td>Chapas metálicas</td><td><span class="check is-no"></span><span class="status-faltando">faltando</span></td><td>Aço galvanizado ou Al. Para climas frios e isolados. Adicionar.</td></tr>
+        <tr><td>EVA / placas geodésicas</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>Vai além do guia. OK.</td></tr>
+        <tr><td>Taipa-leve / bioconstrução</td><td><span class="check is-ok"></span><span class="status-ok">presente</span></td><td>Vai além do guia.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 04 PEDAGOGIA -->
+  <section class="sheet" id="pedagogia">
+    <div class="sheet-head">
+      <div class="sheet-tag">04</div>
+      <h2><em>Lacunas</em> pedagógicas</h2>
+      <div class="sheet-meta">o que o construtor mão-na-massa precisa entender</div>
+    </div>
+
+    <div class="find-grid">
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">05</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">benefícios</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Os <em>benefícios intangíveis</em> não são vendidos</div>
+          <div class="find-cite">
+            <em>"30% de economia com aquecimento e resfriamento… acústica excelente… vão interno livre… sensação de bem-estar e acolhimento devido ao formato que lembra um útero/barriga materna."</em><br>
+            — Maron, 2018, p. 54-55
+          </div>
+          <div class="find-impl">
+            O projeto é técnico e factual, mas <strong>não menciona</strong> esses 6 benefícios estruturais que o Maron destaca. Para um cliente final ou um construtor que precisa "vender" o domo a um cliente, esses números são munição.
+            <strong>Sugestão:</strong> seção "por que um domo?" na etapa 1, ou um card adicional no Memorial (etapa 5).
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 1</span><span>memorial</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">06</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">geometria</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Falta a metáfora da <em>"esfera magnética imaginária"</em></div>
+          <div class="find-cite">
+            <em>"Suponhamos que existe uma esfera oca e invisível com magnetismo… os vértices do icosaedro são bolas de ferro… as bolas serão fortemente atraídas até colarem na superfície da esfera, transformando o icosaedro em uma geodésica frequência 2."</em><br>
+            — Maron, 2018, p. 38-41
+          </div>
+          <div class="find-impl">
+            É a explicação <strong>pedagogicamente mais clara</strong> de toda a literatura geodésica em PT. O explainer A/B/C que já adicionei descreve a projeção radial, mas <strong>perde a metáfora do imã</strong>. Trocar "projetar radialmente" por "atrair magneticamente para a superfície" deixa visualmente óbvio. Vale uma micro-animação SVG.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 2</span><span>animação</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-baixo">
+        <div class="find-side">
+          <div class="find-num">07</div>
+          <div class="find-tag">baixo</div>
+          <div class="find-tag">estrutura</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">As barras <em>recebem tração + compressão</em>; os nós <em>concentram cargas</em></div>
+          <div class="find-cite">
+            <em>"A função estrutural das barras é receber e transmitir os esforços de tração e compressão às conexões… os nós são os pontos onde todas as cargas da estrutura e de forças externas convergem."</em><br>
+            — Maron, 2018, p. 45-48
+          </div>
+          <div class="find-impl">
+            Insight estrutural importante que <strong>não aparece em nenhum lugar do app</strong>. Para um construtor, entender "onde a estrutura aguenta esforço" é o que diferencia uma escolha consciente de material/conector vs. uma escolha aleatória. <strong>Sugestão:</strong> entrada no glossário + tooltip ao passar sobre uma barra no canvas 3D.
+          </div>
+          <div class="find-tag-list">
+            <span>glossário</span><span>etapa 4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-baixo">
+        <div class="find-side">
+          <div class="find-num">08</div>
+          <div class="find-tag">baixo</div>
+          <div class="find-tag">cadeia didática</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">A <em>maquete educacional</em> não existe no app</div>
+          <div class="find-cite">
+            <em>"Comece pequeno e vá aumentando a escala gradativamente… maquete nível 1 (tetraedro) → nível 2 (1V icosaedro) → nível 3 (2V) com palitos de churrasco e balas de goma."</em><br>
+            — Maron, 2018, p. 57-67
+          </div>
+          <div class="find-impl">
+            Maron dedica 1/6 do livro a ensinar a fazer maquete primeiro. <strong>Faz sentido pedagógico</strong>: testar geometria em escala 1:30 antes de comprar madeira. O app pode ter um modo "maquete first" — recibo de compras = palitos + balas de goma, mapa de montagem ilustrado.
+            <strong>Sugestão:</strong> botão "ver versão maquete" no dossiê — gera cut list em 13.5/15.5cm para palitos de churrasco.
+          </div>
+          <div class="find-tag-list">
+            <span>nova feature</span><span>etapa 5</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-baixo">
+        <div class="find-side">
+          <div class="find-num">09</div>
+          <div class="find-tag">baixo</div>
+          <div class="find-tag">glossário</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Termos do guia que <em>faltam no glossário</em></div>
+          <div class="find-impl">
+            "Vão livre", "homeostase térmica", "esfera imaginária / matriz / geode", "vigas recíprocas / giro", "ferrocimento", "Sólidos Platônicos", "Buckminsterfullereno", "Bauersfeld", "Walter Bauersfeld 1922". Cada um vira um popover educativo no flow.
+          </div>
+          <div class="find-tag-list">
+            <span>glossario.js</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 05 UX -->
+  <section class="sheet" id="ux">
+    <div class="sheet-head">
+      <div class="sheet-tag">05</div>
+      <h2><em>Oportunidades</em> de UX</h2>
+      <div class="sheet-meta">priorizadas por impacto × esforço</div>
+    </div>
+
+    <div class="find-grid">
+
+      <div class="find severity-alto">
+        <div class="find-side">
+          <div class="find-num">10</div>
+          <div class="find-tag">alto</div>
+          <div class="find-tag">impacto/esforço: A1</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Cita destacada da <em>"equação Maron"</em> na etapa Forma</div>
+          <div class="find-cite">
+            <em>"QUANTO MAIOR A FREQUÊNCIA = MAIOR O Nº DE BARRAS = MAIOR O Nº DE CONEXÕES = MAIS RESISTENTE = MAIS ARREDONDADA = MAIS TRABALHO = MAIS $"</em><br>
+            — Maron, 2018, p. 43
+          </div>
+          <div class="find-impl">
+            Síntese perfeita do trade-off. Hoje o app tem hint pequeno por frequência. <strong>Sugestão:</strong> banner visual da equação no canto da etapa 2, com cada termo se acendendo conforme o usuário mexe no slider de V. Pedagogia + estética + interatividade num só lance.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 2</span><span>baixo esforço</span><span>alto impacto</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">11</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">impacto/esforço: A2</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Aviso quando <em>truncamento = esfera completa</em></div>
+          <div class="find-impl">
+            Hoje o usuário pode selecionar "esfera" sem aviso de que isso não tem piso, não pode ser apoiado. Adicionar callout vermelho: <em>"Esfera completa = 'esfera geodésica'. Sem piso. Para escultura, balão ou maquete. Para casa, escolha ½ ou ⅝."</em>
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 2</span><span>5 min</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">12</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">impacto/esforço: A2</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Filtro de coberturas por <em>nível tecnológico</em></div>
+          <div class="find-impl">
+            Maron organiza coberturas em "baixo custo/baixa tecnologia" → "alta tecnologia". O app lista todas juntas. <strong>Sugestão:</strong> 3 abas — <em>DIY/recicladas</em> (palha, banner, papelão), <em>mercado/industrial</em> (lona PVC, telhas asfálticas, policarbonato), <em>bioconstrução</em> (ferrocimento, taipa-leve). Ajuda quem chega ao app a se posicionar.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 4</span><span>filtro</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-medio">
+        <div class="find-side">
+          <div class="find-num">13</div>
+          <div class="find-tag">médio</div>
+          <div class="find-tag">impacto/esforço: B2</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Galeria de <em>exemplos famosos</em> com escala comparativa</div>
+          <div class="find-impl">
+            "Spaceship Earth" (50m), "Eden Project" (53m), "Biosfera Montreal" (76m), "Nagoya Dome" (187m), "EcoCamp Patagônia" (8m), "Drop City" (5m). <strong>Sugestão:</strong> faixa rolável na etapa 1 mostrando seu domo na mesma escala desses ícones — ajuda a calibrar expectativa.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 1</span><span>placeholder de imagens</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-baixo">
+        <div class="find-side">
+          <div class="find-num">14</div>
+          <div class="find-tag">baixo</div>
+          <div class="find-tag">impacto/esforço: A1</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">"<em>300.000 domos</em> no mundo" como prova social</div>
+          <div class="find-impl">
+            Estatística memorável. Hoje não aparece. <strong>Sugestão:</strong> rodapé do topbar ou splash inicial: "Você está projetando o domo nº 300.001."
+          </div>
+          <div class="find-tag-list">
+            <span>topbar</span><span>1 min</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-baixo">
+        <div class="find-side">
+          <div class="find-num">15</div>
+          <div class="find-tag">baixo</div>
+          <div class="find-tag">impacto/esforço: B1</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Métrica de <em>"esfericidade"</em> ao escolher V</div>
+          <div class="find-impl">
+            Hoje a frequência mostra nº de barras e tipos, mas não "o quão esférico". Adicionar barra de progresso: 1V = 23% esférico (icosaedro), 2V = 60%, 3V = 78%, 4V = 89%, ∞ = 100% (esfera real). Ajuda a entender o ganho marginal de aumentar V.
+          </div>
+          <div class="find-tag-list">
+            <span>etapa 2</span><span>cálculo simples</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="find severity-baixo">
+        <div class="find-side">
+          <div class="find-num">16</div>
+          <div class="find-tag">baixo</div>
+          <div class="find-tag">impacto/esforço: C2</div>
+        </div>
+        <div class="find-body">
+          <div class="find-title">Modo <em>"maquete primeiro"</em> com palitos + balas</div>
+          <div class="find-impl">
+            Implementação do Maron como onboarding educacional. Toggle no topbar: "modo maquete" — recalcula cut list em escala 1:30 (15cm vs 5m), troca a lista de compras pra palitos+balas+cola quente, mostra fotos do passo-a-passo de Maron. Antes de comprar madeira, faça a maquete.
+          </div>
+          <div class="find-tag-list">
+            <span>nova feature</span><span>maior esforço</span><span>diferencial</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 06 CITAÇÕES -->
+  <section class="sheet" id="citacoes">
+    <div class="sheet-head">
+      <div class="sheet-tag">06</div>
+      <h2>Citações <em>memoráveis</em></h2>
+      <div class="sheet-meta">para enriquecer dossiê, memorial e materiais de marketing</div>
+    </div>
+
+    <div class="memorial">
+      <p>
+        O guia tem várias frases citáveis que dão profundidade e autoridade ao que o app
+        produz. Considere usá-las como epígrafes em seções do dossiê, em onboarding ou
+        em qualquer material de divulgação:
+      </p>
+    </div>
+
+    <div class="pullquote">
+      "Geodésica: a forma mais forte, leve e eficiente de encerrar espaço desenhada pelo homem."
+      <span class="source">Instituto Americano de Arquitetura — apud Maron, 2018, p. 1</span>
+    </div>
+
+    <div class="pullquote">
+      "Você não muda as coisas lutando contra a realidade atual. Para mudar algo é preciso construir um modelo novo que tornará o modelo atual obsoleto."
+      <span class="source">Buckminster Fuller — apud Maron, 2018, p. 8</span>
+    </div>
+
+    <div class="pullquote">
+      "Não há crise de energia, somente a crise de ignorância."
+      <span class="source">B. Fuller — apud Maron, 2018, p. 18</span>
+    </div>
+
+    <div class="pullquote">
+      "Onde há matéria, há geometria."
+      <span class="source">Kepler — apud Maron, 2018, p. 30</span>
+    </div>
+
+    <div class="pullquote">
+      "Bucky foi o precursor da Ciência do Design — defendeu a revolução pelo design como alternativa à política, buscando otimizar os recursos planetários em benefício de 100% da humanidade."
+      <span class="source">Maron, 2018, p. 20, parafraseando trecho de Wikipédia citado no guia</span>
+    </div>
+  </section>
+
+  <!-- 07 ROADMAP -->
+  <section class="sheet" id="roadmap">
+    <div class="sheet-head">
+      <div class="sheet-tag">07</div>
+      <h2><em>Plano</em> de ação</h2>
+      <div class="sheet-meta">priorizado em 3 sprints — quick wins primeiro</div>
+    </div>
+
+    <div class="memorial">
+      <p>
+        Matriz impacto × esforço aplicada aos 19 achados. <strong>Sprint 1</strong> são
+        quick wins (alto impacto, baixo esforço — A1). <strong>Sprint 2</strong> são
+        consolidações de catálogo e pedagogia. <strong>Sprint 3</strong> são novas
+        features estruturais (maquete, vigas recíprocas, modo construtor avançado).
+      </p>
+    </div>
+
+    <div class="roadmap">
+
+      <div class="road-col">
+        <div class="road-head">
+          <div class="road-name">Sprint 1</div>
+          <div class="road-sub">quick wins · 1-2 dias</div>
+        </div>
+        <div class="road-body">
+          <ul>
+            <li><strong>Equação Maron</strong> em destaque na etapa 2 (achado 10)</li>
+            <li><strong>Aviso "esfera completa"</strong> no truncamento (achado 11)</li>
+            <li><strong>Crédito Bauersfeld 1922</strong> + timeline no dossiê (achado 01)</li>
+            <li>Padronizar <strong>"v" minúsculo</strong> (achado 03)</li>
+            <li>"<strong>300.000 domos no mundo</strong>" no topbar (achado 14)</li>
+            <li>Tag <strong>articulado vs. fixo</strong> em cada hub (achado 03 catálogo)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="road-col">
+        <div class="road-head">
+          <div class="road-name">Sprint 2</div>
+          <div class="road-sub">consolidação · 3-5 dias</div>
+        </div>
+        <div class="road-body">
+          <ul>
+            <li><strong>+5 coberturas</strong>: ferrocimento, telhas asfálticas, policarbonato, vidro, chapa metálica</li>
+            <li><strong>+2 estruturas</strong>: PVC, tubo metálico (Al + aço)</li>
+            <li>Card <strong>"por que um domo?"</strong> na etapa 1 (achado 05)</li>
+            <li><strong>Glossário expandido</strong>: 8 termos do Maron (achado 09)</li>
+            <li><strong>Filtro de coberturas por nível tecnológico</strong> (achado 12)</li>
+            <li>Insight estrutural <strong>"barras → tração, nós → cargas"</strong> (achado 07)</li>
+            <li>Métrica de <strong>esfericidade</strong> no segmented de V (achado 15)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="road-col">
+        <div class="road-head">
+          <div class="road-name">Sprint 3</div>
+          <div class="road-sub">features estruturais · 1-2 semanas</div>
+        </div>
+        <div class="road-body">
+          <ul>
+            <li><strong>Vigas recíprocas / "giro"</strong> como 6ª opção de hub (achado 04)</li>
+            <li><strong>Modo "maquete primeiro"</strong> — palitos + balas (achado 16)</li>
+            <li>Animação SVG da <strong>esfera magnética</strong> ilustrando 1V → 2V (achado 06)</li>
+            <li><strong>Galeria de exemplos famosos</strong> com escala comparativa (achado 13)</li>
+            <li>Modo iniciante × construtor avançado (tweak já planejado v4)</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="memorial" style="margin-top:32px;">
+      <p>
+        <strong>Recomendação:</strong> implementar Sprint 1 dentro do dia
+        — todos são baixo esforço e alto retorno didático. Sprint 2 já justifica
+        uma versão "v3.1" empacotada. Sprint 3 é onde o app passa de
+        <em>calculadora de cut list</em> para <em>plataforma educacional brasileira de domos</em> —
+        é onde estará o diferencial competitivo real.
+      </p>
+    </div>
+  </section>
+
+  <!-- BIBLIOGRAFIA -->
+  <section class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-tag">FIM</div>
+      <h2><em>Fonte</em> auditada</h2>
+      <div class="sheet-meta">referência única deste documento</div>
+    </div>
+    <div class="cite-list">
+      <div>
+        MARON, Jorge. <strong>Cúpulas Geodésicas — Guia para Iniciantes</strong>.
+        Ameríndia — Design em Sustentabilidade, abril de 2018. 70 páginas. Licença Creative Commons.
+        Site: <a href="https://www.amerindia.eco.br" target="_blank" rel="noopener">amerindia.eco.br</a>.
+        Autor: Designer em Sustentabilidade, formado pelo Cerbambu e Gaia Education.
+      </div>
+      <div style="margin-top:12px;color:var(--ink-soft);font-style:italic;">
+        Auditoria conduzida em 16 mai 2026 cruzando 70 páginas do guia contra o estado
+        atual do "Gerador de Domos v3" (wizard-app-v3.js, materials-v2.js, wizard-v3-extras.js,
+        wizard-v3-step2.js, wizard-styles.css + wizard-v3-styles.css).
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
