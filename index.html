@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#b4742a" />
+<meta name="description" content="Ferramenta web em pt-BR para projetar cúpulas geodésicas DIY." />
+<title>Gerador de Domos v3 · canteiro técnico</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/svg+xml" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="wizard-styles.css" />
+<link rel="stylesheet" href="wizard-v3-styles.css" />
+</head>
+<body>
+
+<!-- Topo -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">◇</div>
+    <div class="brand-text">
+      <div class="brand-name"><em>Domo</em> · canteiro técnico v3</div>
+      <div class="brand-sub">300.000+ domos no mundo · você está projetando o próximo</div>
+    </div>
+  </div>
+
+  <nav class="stepper" id="stepper">
+    <!-- preenchido pelo JS -->
+  </nav>
+
+  <div class="topbar-right">
+    <button class="btn-ghost" id="btn-reset">limpar</button>
+  </div>
+</header>
+
+<main class="stage" id="stage">
+  <!-- preenchido por cada step -->
+</main>
+
+<footer class="footbar">
+  <div class="footbar-summary" id="footbar-summary">
+    <!-- mini-resumo dos parâmetros já escolhidos -->
+  </div>
+  <div class="footbar-nav">
+    <button class="btn-ghost" id="btn-prev" disabled>← voltar</button>
+    <button class="btn-primary" id="btn-next">avançar →</button>
+  </div>
+</footer>
+
+<div class="grain"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="wizard-v3-app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
