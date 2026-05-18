@@ -611,7 +611,7 @@ function renderEsfericidade(freq) {
   `;
   wrap.innerHTML = `
     <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);">
-      <span class="term-link" data-term="esfericidade" style="cursor:help;border-bottom:1px dotted var(--ocre);padding-right:8px;">esfericidade<span class="term-mark" style="position:absolute;display:inline-block;background:var(--ocre);color:var(--paper);border-radius:50%;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;width:13px;height:13px;text-align:center;line-height:13px;">?</span></span>
+      <span class="term-link" data-term="esfericidade">esfericidade<span class="term-mark">?</span></span>
     </div>
     <div style="flex:1;height:6px;background:var(--ink-mist);position:relative;">
       <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:var(--ocre);"></div>
