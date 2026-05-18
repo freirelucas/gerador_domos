@@ -1,0 +1,753 @@
+/* wizard-v3-styles.css — Camada técnica/blueprint sobre o caderno cerrado */
+/* Carrega DEPOIS de wizard-styles.css. Adiciona toolbar 3D, temas, novas seções. */
+
+/* ─── Temas (3 variações exploratórias) ────────────────────────────────── */
+/* Tema 1: cerrado (default, definido em wizard-styles.css) */
+
+/* Tema 2: blueprint — cyan sobre papel azul-escuro */
+html[data-theme="blueprint"] {
+  --paper: #0d2538;
+  --paper-soft: #133349;
+  --paper-deep: #0a1d2c;
+  --ink: #e6f4ff;
+  --ink-soft: #9cc5e0;
+  --ink-faint: #5a87a8;
+  --ink-mist: #355875;
+  --ocre: #5ee0ff;
+  --ocre-soft: #b0ecff;
+  --verde: #a0f0a0;
+  --verde-soft: #c8f6c8;
+  --blueprint: #ffd76a;
+  --sangue: #ff7a5a;
+  --violeta: #c5a5ff;
+}
+html[data-theme="blueprint"] body {
+  background-image:
+    linear-gradient(rgba(94,224,255,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94,224,255,0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+html[data-theme="blueprint"] em,
+html[data-theme="blueprint"] .step-title em,
+html[data-theme="blueprint"] .brand-name em,
+html[data-theme="blueprint"] .summary-card h3 em,
+html[data-theme="blueprint"] .sheet-head h2 em,
+html[data-theme="blueprint"] .cut-card-label,
+html[data-theme="blueprint"] .step-eyebrow,
+html[data-theme="blueprint"] .section-title,
+html[data-theme="blueprint"] .control-block h4 {
+  color: var(--ocre);
+}
+html[data-theme="blueprint"] .canvas-wrap::before {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(94,224,255,0.18) 39px 40px),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(94,224,255,0.18) 39px 40px);
+  border-color: var(--ocre);
+}
+html[data-theme="blueprint"] .grain { display: none; }
+
+/* Tema 3: drafting — papel branco, nanquim preto, vermelho de marcação */
+html[data-theme="drafting"] {
+  --paper: #f8f6ef;
+  --paper-soft: #fefdf7;
+  --paper-deep: #ece8d8;
+  --ink: #0a0a0a;
+  --ink-soft: #3a3a3a;
+  --ink-faint: #888;
+  --ink-mist: #c8c4b8;
+  --ocre: #c8141c;
+  --ocre-soft: #e84a52;
+  --verde: #1a6b3a;
+  --verde-soft: #4a9c6a;
+  --blueprint: #1a3a6b;
+  --sangue: #c8141c;
+  --violeta: #5a3a8c;
+}
+html[data-theme="drafting"] body {
+  background-image:
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.012) 0%, transparent 70%);
+}
+html[data-theme="drafting"] .grain { opacity: 0.25; }
+html[data-theme="drafting"] .brand-mark { color: var(--ocre); }
+html[data-theme="drafting"] em,
+html[data-theme="drafting"] .step-title em,
+html[data-theme="drafting"] .brand-name em,
+html[data-theme="drafting"] .summary-card h3 em,
+html[data-theme="drafting"] .sheet-head h2 em,
+html[data-theme="drafting"] .cut-card-label,
+html[data-theme="drafting"] .step-eyebrow,
+html[data-theme="drafting"] .section-title,
+html[data-theme="drafting"] .control-block h4 {
+  color: var(--ocre);
+}
+html[data-theme="drafting"] .canvas-wrap {
+  border-width: 2px;
+}
+html[data-theme="drafting"] .canvas-wrap::before {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 49px, rgba(0,0,0,0.045) 49px 50px),
+    repeating-linear-gradient(90deg, transparent 0 49px, rgba(0,0,0,0.045) 49px 50px);
+}
+
+/* ─── Mais "técnico": reduzir uso de serif em alguns lugares ─────────────── */
+.step-title,
+.summary-card h3,
+.sheet-head h2 {
+  /* mantém Cormorant, mas com tracking mais fechado pro feel arquitetônico */
+  letter-spacing: -0.025em;
+}
+
+/* ─── Canvas Toolbar (etapas 2 e 3) ─────────────────────────────────────── */
+.canvas-toolbar {
+  position: absolute;
+  z-index: 7;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  pointer-events: auto;
+}
+.canvas-toolbar .ct-btn {
+  padding: 7px 11px;
+  border: none;
+  border-right: 1px solid var(--ink-faint);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.canvas-toolbar .ct-btn:last-child { border-right: none; }
+.canvas-toolbar .ct-btn:hover { background: var(--paper-deep); color: var(--ink); }
+.canvas-toolbar .ct-btn.is-active {
+  background: var(--ocre);
+  color: var(--paper);
+}
+.canvas-toolbar .ct-divider {
+  width: 1px;
+  background: var(--ink);
+}
+.canvas-toolbar .ct-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+}
+
+/* Slider compacto na toolbar */
+.canvas-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-right: 1px solid var(--ink-faint);
+  background: var(--paper);
+}
+.canvas-slider-wrap:last-child { border-right: none; }
+.canvas-slider-wrap .csl-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.canvas-slider-wrap .csl-value {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ocre);
+  font-weight: 500;
+  min-width: 36px;
+  text-align: right;
+}
+.canvas-slider-wrap input[type="range"] {
+  width: 90px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  background: transparent;
+}
+.canvas-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
+  height: 1px; background: var(--ink);
+}
+.canvas-slider-wrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px; height: 10px;
+  background: var(--ocre);
+  border: 1px solid var(--ink);
+  margin-top: -5px;
+  border-radius: 50%;
+}
+.canvas-slider-wrap input[type="range"]::-moz-range-track { height: 1px; background: var(--ink); }
+.canvas-slider-wrap input[type="range"]::-moz-range-thumb {
+  width: 10px; height: 10px; background: var(--ocre); border: 1px solid var(--ink); border-radius: 50%;
+}
+
+/* Play / pause button */
+.ct-play {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  cursor: pointer;
+  margin: 4px 6px;
+}
+.ct-play:hover { background: var(--ocre); }
+.ct-play svg { width: 12px; height: 12px; }
+
+/* ─── Indicador de sol (sun gizmo) ──────────────────────────────────────── */
+.canvas-sun-readout {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: var(--paper);
+  border: 1px solid var(--ink-faint);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.canvas-sun-readout .sun-disk {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe7a0 0%, #f5a830 60%, #c66a0a 100%);
+  box-shadow: 0 0 8px rgba(245,168,48,0.5);
+}
+.canvas-sun-readout strong { color: var(--ocre); font-weight: 500; }
+
+/* ─── Tweaks Panel (3 temas) ────────────────────────────────────────────── */
+.tweaks-fab {
+  position: fixed;
+  bottom: calc(var(--foot-h) + 16px);
+  right: 20px;
+  z-index: 100;
+  width: 44px; height: 44px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(28,18,9,0.18);
+  transition: all 0.2s;
+}
+.tweaks-fab:hover { transform: scale(1.07); background: var(--ocre); }
+
+.tweaks-panel {
+  position: fixed;
+  bottom: calc(var(--foot-h) + 70px);
+  right: 20px;
+  z-index: 100;
+  width: 280px;
+  background: var(--paper-soft);
+  border: 1px solid var(--ink);
+  box-shadow: 0 10px 32px rgba(28,18,9,0.22);
+  padding: 18px;
+  display: none;
+}
+.tweaks-panel.is-open { display: block; animation: fade 0.18s ease-out both; }
+.tweaks-panel h3 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ocre);
+  margin-bottom: 12px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tweaks-panel h3 button {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 4px;
+  line-height: 1;
+}
+.tweaks-panel h3 button:hover { color: var(--ink); }
+
+.theme-swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.theme-swatch {
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--ink-faint);
+  padding: 0;
+  text-align: center;
+  transition: all 0.12s;
+}
+.theme-swatch:hover { border-color: var(--ink); }
+.theme-swatch.is-active {
+  border-color: var(--ocre);
+  box-shadow: 0 0 0 1px var(--ocre);
+}
+.theme-swatch .ts-preview {
+  height: 56px;
+  position: relative;
+  border-bottom: 1px solid var(--ink-faint);
+}
+.theme-swatch .ts-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 6px 4px;
+}
+.theme-swatch.is-active .ts-name { color: var(--ink); }
+
+.tweak-row {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--ink-faint);
+}
+.tweak-row > label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.tweak-segs {
+  display: flex;
+  border: 1px solid var(--ink-faint);
+}
+.tweak-segs button {
+  flex: 1;
+  padding: 7px 4px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--ink-faint);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+.tweak-segs button:last-child { border-right: none; }
+.tweak-segs button:hover { background: var(--paper); }
+.tweak-segs button.is-active { background: var(--ink); color: var(--paper); }
+
+/* ─── Etapa 5 v3: novas seções ─────────────────────────────────────────── */
+
+/* Cargas vento/neve por região */
+.regiao-card {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 24px;
+  padding: 22px 24px;
+  background: var(--paper-soft);
+  border: 1px solid var(--ink);
+  margin-top: 14px;
+}
+.regiao-info h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.regiao-info .cidades {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+.regiao-info .observ {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  border-left: 2px solid var(--ocre);
+  padding-left: 10px;
+}
+.regiao-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--ink-faint);
+}
+.regiao-metric .label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.regiao-metric .value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--ocre);
+  line-height: 1.05;
+}
+.regiao-metric .unit {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-soft);
+}
+.regiao-metric .raciocinio {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-faint);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.regiao-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.regiao-selector button {
+  padding: 6px 12px;
+  border: 1px solid var(--ink-faint);
+  background: var(--paper-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.regiao-selector button:hover { background: var(--paper); color: var(--ink); }
+.regiao-selector button.is-active {
+  border-color: var(--ocre);
+  background: var(--paper);
+  color: var(--ocre);
+  box-shadow: 0 0 0 1px var(--ocre);
+}
+
+/* Diagrama de cargas */
+.cargas-diagram {
+  background: var(--paper);
+  border: 1px solid var(--ink-faint);
+  padding: 18px;
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+.cargas-diagram svg { display: block; width: 100%; height: auto; }
+
+/* ─── Lista de compras agrupada por loja ──────────────────────────────── */
+.lojas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+.loja-card {
+  border: 1px solid var(--ink);
+  background: var(--paper-soft);
+  display: flex;
+  flex-direction: column;
+}
+.loja-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper);
+}
+.loja-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  border: 1px solid var(--ink);
+}
+.loja-meta {
+  flex: 1;
+}
+.loja-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.loja-hint {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.loja-total {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ocre);
+}
+.loja-items {
+  padding: 8px 0;
+}
+.loja-item {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 10px;
+  padding: 10px 18px;
+  font-size: 12.5px;
+  border-bottom: 1px dashed var(--ink-faint);
+  align-items: baseline;
+}
+.loja-item:last-child { border-bottom: none; }
+.loja-item .qty {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+.loja-item .desc {
+  line-height: 1.45;
+  color: var(--ink);
+}
+.loja-item .desc .calc {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.loja-item .price {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+}
+.loja-foot {
+  padding: 12px 18px;
+  border-top: 1px solid var(--ink-faint);
+  background: var(--paper);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.loja-foot a {
+  color: var(--blueprint);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+
+/* ─── Diário de obra (checklist) ───────────────────────────────────────── */
+.diario {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+.diario-day {
+  border: 1px solid var(--ink-faint);
+  background: var(--paper-soft);
+}
+.diario-day.is-done {
+  border-color: var(--verde);
+  background: rgba(74,93,58,0.04);
+}
+.diario-day-head {
+  display: grid;
+  grid-template-columns: 90px 1fr auto auto;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--ink-faint);
+  align-items: center;
+  background: var(--paper);
+}
+.diario-day-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--ocre);
+}
+.diario-day-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.diario-day-progress {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+.diario-day-progress strong { color: var(--ocre); font-weight: 500; }
+.diario-date input {
+  width: 100px;
+  padding: 4px 6px;
+  border: 1px solid var(--ink-faint);
+  background: var(--paper);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ink);
+}
+.diario-tasks {
+  padding: 8px 0;
+}
+.diario-task {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  padding: 8px 18px;
+  font-size: 13px;
+  line-height: 1.55;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.diario-task:hover { background: var(--paper); }
+.diario-task.is-done {
+  color: var(--ink-faint);
+  text-decoration: line-through;
+  text-decoration-color: var(--verde);
+}
+.diario-check {
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+.diario-task.is-done .diario-check {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--paper);
+}
+.diario-task.is-done .diario-check::after { content: '✓'; font-size: 12px; }
+
+.diario-notes {
+  padding: 12px 18px;
+  border-top: 1px dashed var(--ink-faint);
+  background: var(--paper);
+}
+.diario-notes textarea {
+  width: 100%;
+  min-height: 50px;
+  padding: 8px 10px;
+  border: 1px solid var(--ink-faint);
+  background: var(--paper-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  color: var(--ink);
+  line-height: 1.55;
+  resize: vertical;
+}
+.diario-notes label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.diario-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  margin-bottom: 14px;
+}
+.diario-overview .ov {
+  text-align: center;
+}
+.diario-overview .ov-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ocre);
+}
+.diario-overview .ov-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247,240,217,0.65);
+  margin-top: 4px;
+}
+
+/* ─── Print mais limpo para o construtor ──────────────────────────────── */
+@media print {
+  .canvas-toolbar, .canvas-sun-readout, .tweaks-fab, .tweaks-panel { display: none !important; }
+  .diario-day { break-inside: avoid; page-break-inside: avoid; }
+  .loja-card { break-inside: avoid; page-break-inside: avoid; }
+  .regiao-card { break-inside: avoid; }
+}
+
+/* ─── Acréscimos no canvas-wrap para abrigar toolbar ─────────────────── */
+.canvas-wrap.has-toolbar { padding-top: 56px; }
+.canvas-wrap.has-toolbar canvas { padding-top: 56px; }
+
+/* sun light disk (sprite SVG no canto) */
+.sun-arc {
+  position: absolute;
+  z-index: 6;
+  bottom: 56px;
+  left: 14px;
+  width: 200px;
+  height: 60px;
+  background: var(--paper);
+  border: 1px solid var(--ink-faint);
+  padding: 6px 10px;
+}
+.sun-arc svg { width: 100%; height: 100%; }
+
+/* ─── Responsivo ───────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .canvas-toolbar { 
+    position: relative; left: auto; transform: none; 
+    flex-wrap: wrap; top: auto; margin-bottom: 8px;
+  }
+  .canvas-wrap.has-toolbar { padding-top: 0; }
+  .cargas-diagram { grid-template-columns: 1fr; }
+  .regiao-card { grid-template-columns: 1fr; }
+  .diario-day-head { grid-template-columns: 1fr; gap: 8px; }
+}

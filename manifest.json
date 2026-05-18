@@ -1,0 +1,20 @@
+{
+  "name": "Gerador de Domos · canteiro técnico",
+  "short_name": "Domos",
+  "description": "Ferramenta para projetar cúpulas geodésicas DIY em pt-BR.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#efe6cf",
+  "theme_color": "#b4742a",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

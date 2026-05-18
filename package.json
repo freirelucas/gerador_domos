@@ -1,0 +1,12 @@
+{
+  "name": "gerador-domos",
+  "version": "3.0.0",
+  "description": "Gerador de cúpulas geodésicas DIY · pt-BR · sem build step",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "CC-BY-SA-4.0"
+}

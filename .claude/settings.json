@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pkill -f 'python3 -m http.server 8000' 2>/dev/null; nohup python3 -m http.server 8000 >/tmp/dome-server.log 2>&1 & disown; echo 'dome server on :8000'"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m http.server:*)",
+      "Bash(node --test:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run dev:*)",
+      "Bash(git:*)"
+    ]
+  }
+}
