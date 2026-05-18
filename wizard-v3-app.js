@@ -24,6 +24,7 @@ import { renderStep1, renderStep3, renderStep4 } from './wizard-steps.js';
 import { renderStep5 } from './wizard-dossie.js';
 import { renderStep2V3 } from './wizard-v3-step2.js';
 import { appendDossieExtras, appendStep1Benefits } from './wizard-v3-extras.js';
+import { appendStep1Galeria } from './wizard-v3-galeria.js';
 import { REGIOES, LOJAS } from './regiao-cargas.js';
 
 const ALL_COVERINGS = [...COVERINGS, ...MANTIQUEIRA_COVERINGS];
@@ -728,6 +729,7 @@ function render() {
   if (state.step === 1) {
     renderStep1(wrap, api);
     appendStep1Benefits(wrap, api);
+    appendStep1Galeria(wrap, api);
   }
   else if (state.step === 2) renderStep2V3(wrap, api);
   else if (state.step === 3) renderStep3(wrap, api);

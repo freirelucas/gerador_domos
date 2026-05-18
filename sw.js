@@ -6,7 +6,7 @@
 //   - Network-first só para a navegação (HTML host) com fallback ao cache.
 //   - Bump CACHE_VERSION ao publicar quebra de schema; o sw antigo é purgado.
 
-const CACHE_VERSION = 'dome-v3.0.0';
+const CACHE_VERSION = 'dome-v3.1.0';
 const CORE = [
   './',
   './index.html',
@@ -27,6 +27,7 @@ const CORE = [
   './wizard-v3-app.js',
   './wizard-v3-step2.js',
   './wizard-v3-extras.js',
+  './wizard-v3-galeria.js',
 ];
 
 self.addEventListener('install', (event) => {
