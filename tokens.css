@@ -1,0 +1,91 @@
+/* tokens.css — Design tokens centralizados.
+ *
+ * Carregado ANTES de wizard-styles.css e wizard-v3-styles.css.
+ * Vocabulário de escalas modulares (tipografia, espaçamento, raios, sombras,
+ * motion) consumido pelos arquivos seguintes. NÃO redefine cores: as CSS vars
+ * de cor (--ink, --paper, --ocre, etc.) seguem em wizard-styles.css para
+ * preservar o sistema de temas data-theme="cerrado|blueprint|drafting".
+ */
+
+:root {
+  /* ── Tipografia · escala 1.250 (Major Third) ──────────────────────────── */
+  --fs-xs:    11px;
+  --fs-sm:    13px;
+  --fs-md:    15px;        /* corpo padrão                                  */
+  --fs-lg:    18px;
+  --fs-xl:    22px;
+  --fs-2xl:   28px;
+  --fs-3xl:   36px;
+  --fs-4xl:   48px;
+  --fs-5xl:   60px;        /* hero / step-title                             */
+  --fs-eyebrow: 10.5px;
+
+  /* ── Line-heights ─────────────────────────────────────────────────────── */
+  --lh-tight: 1.10;
+  --lh-snug:  1.30;
+  --lh-base:  1.55;
+
+  /* ── Letter-spacing ───────────────────────────────────────────────────── */
+  --ls-eyebrow: 0.28em;
+  --ls-mono:    0.05em;
+  --ls-display: -0.015em;
+
+  /* ── Espaçamento · escala 4 ───────────────────────────────────────────── */
+  --sp-0:  0;
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-7:  32px;
+  --sp-8:  40px;
+  --sp-9:  48px;
+  --sp-10: 64px;
+
+  /* ── Border radius ─────────────────────────────────────────────────────
+   * Suaviza cantos sem perder a sobriedade do "caderno cerrado". Bordas
+   * continuam 1px solid var(--ink); só o raio mudou.
+   */
+  --r-none: 0;
+  --r-sm:   2px;            /* chips, tags                                  */
+  --r-md:   4px;            /* inputs, botões pequenos                      */
+  --r-lg:   8px;            /* cards                                        */
+  --r-full: 9999px;         /* pílulas, thumbs circulares                   */
+
+  /* ── Sombras · sutis ──────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px  rgba(28,18,9,0.08);
+  --shadow-md: 0 2px 8px  rgba(28,18,9,0.10);
+  --shadow-lg: 0 4px 16px rgba(28,18,9,0.12);
+
+  /* ── Foco · ring centralizado ─────────────────────────────────────────── */
+  --focus-ring-width:  3px;
+  --focus-ring-offset: 2px;
+
+  /* ── Motion ───────────────────────────────────────────────────────────── */
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    320ms;
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ── Touch targets ────────────────────────────────────────────────────── */
+  --touch-min: 44px;
+}
+
+/* ── Acessibilidade · reduced motion ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration:   0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:  0.01ms !important;
+    scroll-behavior:      auto !important;
+  }
+}

@@ -6,12 +6,13 @@
 //   - Network-first só para a navegação (HTML host) com fallback ao cache.
 //   - Bump CACHE_VERSION ao publicar quebra de schema; o sw antigo é purgado.
 
-const CACHE_VERSION = 'dome-v3.1.0';
+const CACHE_VERSION = 'dome-v3.2.0';
 const CORE = [
   './',
   './index.html',
   './manifest.json',
   './icon.svg',
+  './tokens.css',
   './wizard-styles.css',
   './wizard-v3-styles.css',
   './dom-helpers.js',

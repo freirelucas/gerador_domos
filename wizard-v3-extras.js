@@ -86,8 +86,8 @@ export function appendStep1Benefits(wrap, api) {
     },
     {
       icon: '◐', n: '300k', unit: 'mundo',
-      title: 'Comprovado em campo',
-      desc: 'Construções desde 1922 (Bauersfeld/Zeiss). Hoje há 300.000+ em todo o globo.',
+      title: 'História provada',
+      desc: 'Construções desde 1922 (Bauersfeld/Zeiss). Hoje há mais de 300 mil em todo o mundo.',
     },
     {
       icon: '◌', n: '+30%', unit: 'mais rápido',
@@ -415,7 +415,7 @@ function renderCargasSheet(state, dome) {
   // Memorial técnico
   sheet.appendChild(el('div', { class: 'memorial', style: { marginTop: '20px', fontSize: '13.5px' } }, [
     el('p', {}, [
-      el('em', {}, 'Aviso de engenharia: '),
+      el('em', {}, '⚠ verifique com um engenheiro: '),
       'os números acima são estimativas conservadoras baseadas em NBR 6123 reduzida (coeficientes S₁ = 1, S₂ = 0,86, S₃ = 1) e Cₐ = 0,65 para domo geodésico ⅝. ',
       'Para uso comercial, hospedagem ou estrutura > 8 m de diâmetro, contrate ',
       el('strong', {}, 'cálculo estrutural detalhado'),

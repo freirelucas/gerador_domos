@@ -22,6 +22,28 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ─── Foco por teclado · token central ───────────────────────────────────
+ * Esconde o outline padrão do browser e impõe um ring ocre nítido APENAS
+ * quando o foco veio de teclado (`:focus-visible`). Clique do mouse não
+ * mostra o ring — só a navegação por Tab.
+ */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: var(--focus-ring-width) solid var(--ocre);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--r-md);
+}
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+button:focus-visible {
+  outline-offset: 3px;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-offset: 1px;
+}
+
 html, body {
   background: var(--paper);
   color: var(--ink);
@@ -569,34 +591,52 @@ em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 
   font-weight: 500;
 }
 
-/* Slider */
+/* Slider · thumb circular, track 4px, touch-friendly */
 .slider {
   width: 100%;
   -webkit-appearance: none;
   appearance: none;
-  height: 20px;
+  height: 28px;
   background: transparent;
+  cursor: pointer;
 }
 .slider::-webkit-slider-runnable-track {
-  height: 1px; background: var(--ink);
+  height: 4px;
+  background: var(--ink-mist);
+  border-radius: var(--r-full);
 }
-.slider::-moz-range-track { height: 1px; background: var(--ink); }
+.slider::-moz-range-track {
+  height: 4px;
+  background: var(--ink-mist);
+  border-radius: var(--r-full);
+}
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 14px; height: 14px;
-  background: var(--ocre);
-  border: 1px solid var(--ink);
-  margin-top: -7px;
+  width: 22px; height: 22px;
+  background: var(--ink);
+  border: 2px solid var(--ocre);
+  margin-top: -9px;
   cursor: grab;
-  border-radius: 0;
-  transform: rotate(45deg);
+  border-radius: var(--r-full);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 .slider::-moz-range-thumb {
-  width: 12px; height: 12px;
-  background: var(--ocre);
-  border: 1px solid var(--ink);
+  width: 22px; height: 22px;
+  background: var(--ink);
+  border: 2px solid var(--ocre);
   cursor: grab;
-  border-radius: 0;
+  border-radius: var(--r-full);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.slider:hover::-webkit-slider-thumb { transform: scale(1.1); box-shadow: var(--shadow-md); }
+.slider:hover::-moz-range-thumb     { transform: scale(1.1); box-shadow: var(--shadow-md); }
+.slider:active::-webkit-slider-thumb,
+.slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(180,116,42,0.25); }
+.slider:active::-moz-range-thumb,
+.slider:focus-visible::-moz-range-thumb     { box-shadow: 0 0 0 4px rgba(180,116,42,0.25); }
+@media (max-width: 720px) {
+  .slider::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: -12px; }
+  .slider::-moz-range-thumb     { width: 28px; height: 28px; }
 }
 
 /* Segmented */
@@ -852,6 +892,32 @@ em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
   color: var(--ink-soft);
+}
+
+/* Botão de colapso do dossiê. Pequeno chevron à direita do header. */
+.sheet-toggle {
+  background: transparent;
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font-size: var(--fs-lg);
+  font-family: 'IBM Plex Mono', monospace;
+  width: 32px; height: 32px;
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sheet-toggle:hover { background: var(--paper-soft); }
+.sheet--closed .sheet-toggle { transform: rotate(-90deg); }
+.sheet--closed .sheet-head { margin-bottom: 0; padding-bottom: 0; border-bottom: 1px dashed var(--ink-faint); }
+.sheet--closed .sheet-body { display: none; }
+@media print {
+  /* Em impressão, todas as seções abrem para garantir o memorial completo. */
+  .sheet--closed .sheet-body { display: block !important; }
+  .sheet-toggle { display: none !important; }
 }
 
 table.spec {
@@ -1388,9 +1454,96 @@ table.spec tbody tr:hover { background: var(--paper-soft); }
   .budget-row { grid-template-columns: 1fr; }
 }
 
+/* ── Polimento aditivo · cards 2024 ─────────────────────────────────────
+ * Suaviza cantos e troca sombras pesadas por sutis sem mexer nos paddings
+ * (que variam entre componentes por razões específicas). Border continua
+ * `1px solid var(--ink)` — identidade do caderno preservada.
+ */
+.scenario-card,
+.module-tile,
+.climate-tile,
+.material-card,
+.opening-card,
+.summary-card,
+.cut-card,
+.hub-card,
+.metric-card,
+.regiao-card,
+.loja-card,
+.diario-day {
+  border-radius: var(--r-lg);
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.scenario-card:hover,
+.module-tile:hover,
+.climate-tile:hover,
+.material-card:hover,
+.opening-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--ocre);
+}
+
+/* Chips e tags têm raio sutil. */
+.summary-chip,
+.type-chip,
+.sheet-tag,
+.scenario-card .spec,
+.material-card .tags > * {
+  border-radius: var(--r-sm);
+}
+
+/* Inputs e botões padrão pegam raio --r-md. */
+.btn-primary,
+.btn-ghost,
+.seg-btn,
+.ct-btn,
+.theme-swatch,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+  border-radius: var(--r-md);
+}
+
+/* Pílulas do stepper continuam circulares (via existing CSS) — só
+ * garantimos que ícones SVG `aria-hidden` não roubem foco. */
+[aria-hidden="true"] { pointer-events: none; }
+
+/* Toast · feedback inline não-bloqueante (validação suave). */
+.toast {
+  position: fixed;
+  bottom: calc(var(--foot-h) + 20px);
+  left: 50%;
+  transform: translate(-50%, 20px);
+  z-index: 200;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+.toast.is-open {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.toast--warn { border-left: 4px solid var(--ocre); }
+.toast--ok   { border-left: 4px solid var(--verde); }
+
 /* Print */
 @media print {
-  .topbar, .footbar, .grain, .print-bar { display: none !important; }
+  .topbar, .footbar, .grain, .print-bar, .toast { display: none !important; }
   .stage { padding: 0; }
   .sheet { page-break-inside: avoid; padding: 18px 0; }
   body { background: white; }

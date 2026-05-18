@@ -21,7 +21,7 @@ import {
 import { FLOOR_SYSTEMS, MANTIQUEIRA_COVERINGS, validateStructure } from './extras.js';
 import { initGlossarioPopover } from './glossario.js';
 import { renderStep1, renderStep3, renderStep4 } from './wizard-steps.js';
-import { renderStep5 } from './wizard-dossie.js';
+import { renderStep5, initSheetCollapse } from './wizard-dossie.js';
 import { renderStep2V3 } from './wizard-v3-step2.js';
 import { appendDossieExtras, appendStep1Benefits } from './wizard-v3-extras.js';
 import { appendStep1Galeria } from './wizard-v3-galeria.js';
@@ -33,7 +33,7 @@ const ALL_COVERINGS = [...COVERINGS, ...MANTIQUEIRA_COVERINGS];
 // Incremente SCHEMA_VERSION sempre que mudar a FORMA de DEFAULTS (novos
 // campos, rename, remoção). A migração é não-incremental: estados antigos
 // são resetados para DEFAULTS. O usuário só perde o wizard em andamento.
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 
 /**
  * @typedef {Object} DomeState
@@ -80,6 +80,7 @@ const DEFAULTS = {
     diarioStart: null,        // data início obra
     diarioChecks: {},         // map "d2:0" -> bool
     diarioNotes: {},          // map "d2" -> string
+    dossieClosed: ['s-origem'],  // IDs de <section class="sheet"> fechadas
   },
 };
 const STORAGE_KEY = 'dome_wizard_state_v3';
@@ -737,6 +738,7 @@ function render() {
   else if (state.step === 5) {
     renderStep5(wrap, api);
     appendDossieExtras(wrap, api);
+    initSheetCollapse(wrap, state, saveState);
   }
 
   renderFootbar();
@@ -753,14 +755,18 @@ function playIcon(mode) {
 function initTweaks() {
   const fab = document.createElement('button');
   fab.className = 'tweaks-fab';
-  fab.title = 'Tweaks · temas e ajustes';
+  fab.title = 'Ajustes · tema, sol, vistas';
+  fab.setAttribute('aria-label', 'Abrir painel de ajustes: temas, sol e vistas');
+  fab.setAttribute('aria-expanded', 'false');
   fab.innerHTML = '⚙';
   document.body.appendChild(fab);
 
   const panel = document.createElement('div');
   panel.className = 'tweaks-panel';
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-label', 'Painel de ajustes');
   panel.innerHTML = `
-    <h3>tweaks · temas <button id="tweaks-close" aria-label="fechar">×</button></h3>
+    <h3>tweaks · temas <button id="tweaks-close" aria-label="Fechar painel de ajustes">×</button></h3>
     <div class="theme-swatches" id="theme-swatches"></div>
     <div class="tweak-row">
       <label>densidade da interface</label>
@@ -781,6 +787,8 @@ function initTweaks() {
   for (const t of themes) {
     const btn = document.createElement('button');
     btn.className = 'theme-swatch' + (state.v3.tema === t.id ? ' is-active' : '');
+    btn.setAttribute('aria-label', `Tema ${t.name}`);
+    btn.setAttribute('aria-pressed', state.v3.tema === t.id ? 'true' : 'false');
     btn.innerHTML = `
       <div class="ts-preview" style="${t.preview}">
         ${t.id === 'cerrado' ? '<svg viewBox="0 0 60 40" style="position:absolute;inset:0;width:100%;height:100%"><circle cx="30" cy="25" r="11" fill="none" stroke="#b4742a" stroke-width="1.5"/><line x1="19" y1="36" x2="41" y2="36" stroke="#b4742a"/></svg>' :
@@ -794,14 +802,36 @@ function initTweaks() {
       saveState();
       applyTheme(t.id);
       // refresh swatches
-      swWrap.querySelectorAll('.theme-swatch').forEach((b) => b.classList.remove('is-active'));
+      swWrap.querySelectorAll('.theme-swatch').forEach((b) => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('is-active');
+      btn.setAttribute('aria-pressed', 'true');
     };
     swWrap.appendChild(btn);
   }
 
-  fab.onclick = () => panel.classList.toggle('is-open');
-  panel.querySelector('#tweaks-close').onclick = () => panel.classList.remove('is-open');
+  fab.onclick = () => {
+    const open = panel.classList.toggle('is-open');
+    fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) localStorage.setItem('tweaks_seen', '1');
+  };
+  panel.querySelector('#tweaks-close').onclick = () => {
+    panel.classList.remove('is-open');
+    fab.setAttribute('aria-expanded', 'false');
+  };
+
+  // ── First-run hint: balão apontando pro FAB se nunca foi aberto ────
+  if (!localStorage.getItem('tweaks_seen')) {
+    const hint = document.createElement('div');
+    hint.className = 'tweaks-fab-hint';
+    hint.textContent = 'tema · sol · vistas';
+    document.body.appendChild(hint);
+    const hide = () => { hint.classList.add('is-hiding'); setTimeout(() => hint.remove(), 300); };
+    setTimeout(hide, 6000);
+    fab.addEventListener('click', hide, { once: true });
+  }
 
   // density toggle
   panel.querySelectorAll('#tweak-density button').forEach((b) => {
@@ -813,10 +843,51 @@ function initTweaks() {
   });
 }
 
+// ─── Validação suave antes de avançar (nudge, não wall) ─────────────────
+function validateStep(step) {
+  const missing = [];
+  if (step === 1) {
+    if (!state.programa.cenario) missing.push('um cenário de uso');
+    if (!state.programa.clima) missing.push('uma zona climática');
+  } else if (step === 2) {
+    if (!(state.forma.diametro >= 2 && state.forma.diametro <= 12)) missing.push('diâmetro entre 2 e 12 m');
+    if (!(state.forma.freq >= 1 && state.forma.freq <= 4)) missing.push('frequência V entre 1 e 4');
+  } else if (step === 3) {
+    if (!state.aberturas.porta_principal) missing.push('uma porta principal (como você sai do domo?)');
+  } else if (step === 4) {
+    if (!state.sistemas.estrutura) missing.push('estrutura');
+    if (!state.sistemas.conector) missing.push('conector/hub');
+    if (!state.sistemas.cobertura) missing.push('cobertura');
+  }
+  return { ok: missing.length === 0, missing };
+}
+
+let toastTimer = null;
+function showToast(msg, tone = 'warn') {
+  let toast = document.getElementById('dome-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'dome-toast';
+    toast.className = 'toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.remove('toast--ok', 'toast--warn');
+  toast.classList.add('toast--' + tone, 'is-open');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('is-open'), 4200);
+}
+
 // ─── Listeners do topbar / footbar ───────────────────────────────────────
 document.getElementById('btn-next').addEventListener('click', () => {
-  if (state.step === 5) window.print();
-  else goToStep(state.step + 1);
+  if (state.step === 5) { window.print(); return; }
+  const { ok, missing } = validateStep(state.step);
+  if (!ok) {
+    showToast('Faltou: ' + missing.join(', ') + '. Avançando mesmo assim.');
+  }
+  goToStep(state.step + 1);
 });
 document.getElementById('btn-prev').addEventListener('click', () => goToStep(state.step - 1));
 document.getElementById('btn-reset').addEventListener('click', () => {
