@@ -378,6 +378,7 @@ export function appendStep1Galeria(wrap, api) {
       const hit = el('button', {
         type: 'button',
         title: `${it.nome} · ${it.diametro} m`,
+        'aria-label': `${it.nome}, ${it.diametro} metros de diâmetro, ${it.ano}${it.local ? ', ' + it.local : ''}. Clique para detalhes.`,
         style: {
           position: 'absolute',
           left: `${it.hitX}px`,

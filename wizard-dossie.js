@@ -472,6 +472,60 @@ function sheet(id, num, title, meta, children) {
   ]);
 }
 
+/**
+ * Torna cada `<section class="sheet">` no wrap colapsável.
+ * Adiciona um botão chevron no `.sheet-head`, persiste o conjunto de
+ * IDs fechados em `state.v3.dossieClosed`, e re-abre automaticamente
+ * uma seção quando ela é alvo de scroll via âncora do TOC.
+ */
+export function initSheetCollapse(wrap, state, saveState) {
+  const closed = new Set(state.v3.dossieClosed || []);
+  const sheets = wrap.querySelectorAll('section.sheet');
+
+  for (const s of sheets) {
+    const head = s.querySelector('.sheet-head');
+    if (!head) continue;
+
+    const toggle = el('button', {
+      class: 'sheet-toggle',
+      type: 'button',
+      'aria-expanded': closed.has(s.id) ? 'false' : 'true',
+      'aria-controls': s.id + '-body',
+      'aria-label': 'Recolher ou expandir esta seção',
+      onclick: () => {
+        const wasClosed = s.classList.toggle('sheet--closed');
+        toggle.setAttribute('aria-expanded', wasClosed ? 'false' : 'true');
+        if (wasClosed) closed.add(s.id); else closed.delete(s.id);
+        state.v3.dossieClosed = [...closed];
+        saveState();
+      },
+    }, '▾');
+    head.appendChild(toggle);
+
+    // body wrapper para ARIA + animação previsível
+    const body = el('div', { class: 'sheet-body', id: s.id + '-body' });
+    while (head.nextSibling) body.appendChild(head.nextSibling);
+    s.appendChild(body);
+
+    if (closed.has(s.id)) s.classList.add('sheet--closed');
+  }
+
+  // TOC abre a seção automaticamente.
+  wrap.querySelectorAll('.dossie-toc a').forEach((link) => {
+    link.addEventListener('click', () => {
+      const targetId = link.getAttribute('href').slice(1);
+      const target = wrap.querySelector('#' + CSS.escape(targetId));
+      if (target && target.classList.contains('sheet--closed')) {
+        target.classList.remove('sheet--closed');
+        target.querySelector('.sheet-toggle')?.setAttribute('aria-expanded', 'true');
+        closed.delete(targetId);
+        state.v3.dossieClosed = [...closed];
+        saveState();
+      }
+    });
+  });
+}
+
 function specRow(k, v, fontes) {
   const td = el('td', {}, [
     typeof v === 'string' ? document.createTextNode(v) : v,

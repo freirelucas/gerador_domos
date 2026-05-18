@@ -127,15 +127,20 @@ function buildCanvasToolbar(api) {
     const b = el('button', {
       class: 'ct-btn' + (state.v3.viewMode === v.id ? ' is-active' : ''),
       title: 'vista ' + v.label,
+      'aria-label': 'Mudar para vista ' + v.label,
+      'aria-pressed': state.v3.viewMode === v.id ? 'true' : 'false',
       onclick: () => {
         state.v3.viewMode = v.id;
         api.saveState();
         api.applyViewMode(v.id);
-        // re-render só a toolbar pra atualizar 'is-active'
-        bar.querySelectorAll('.ct-btn[data-view]').forEach((x) => x.classList.remove('is-active'));
+        bar.querySelectorAll('.ct-btn[data-view]').forEach((x) => {
+          x.classList.remove('is-active');
+          x.setAttribute('aria-pressed', 'false');
+        });
         b.classList.add('is-active');
+        b.setAttribute('aria-pressed', 'true');
       },
-    }, [el('span', { class: 'ct-icon', html: v.icon }), v.label]);
+    }, [el('span', { class: 'ct-icon', 'aria-hidden': 'true', html: v.icon }), v.label]);
     b.setAttribute('data-view', v.id);
     bar.appendChild(b);
   }

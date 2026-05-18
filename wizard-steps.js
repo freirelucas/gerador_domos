@@ -17,7 +17,7 @@ export function renderStep1(wrap, api) {
   const { state, data } = api;
   wrap.appendChild(head(
     'etapa 01 · programa',
-    'Para que <em>serve</em> seu domo?',
+    'Qual o <em>uso</em> do seu domo?',
     'Escolha um cenário base, ajuste os módulos funcionais, capacidade e zona climática. Tudo isso vai pré-dimensionar a forma na próxima etapa.',
   ));
 
