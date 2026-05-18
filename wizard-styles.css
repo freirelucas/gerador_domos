@@ -1526,6 +1526,163 @@ select {
  * garantimos que ícones SVG `aria-hidden` não roubem foco. */
 [aria-hidden="true"] { pointer-events: none; }
 
+/* ── Tela de abertura (welcome) ─────────────────────────────────────────
+ * Substitui o conteúdo da Etapa 1 na primeira visita. Convida o usuário
+ * a escolher como começar (exemplo pré-preenchido vs do zero).
+ */
+.welcome {
+  max-width: 880px;
+  margin: var(--sp-7) auto 0;
+  animation: fade var(--dur-slow) var(--ease-out) both;
+}
+.welcome-brand { margin-bottom: var(--sp-8); text-align: left; }
+.welcome-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ocre);
+  margin-bottom: var(--sp-3);
+}
+.welcome-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 6vw, 68px);
+  font-weight: 500;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  color: var(--ink);
+  margin-bottom: var(--sp-4);
+}
+.welcome-title em { color: var(--ocre); font-style: italic; font-weight: 500; }
+.welcome-lede {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: var(--fs-lg);
+  line-height: var(--lh-base);
+  color: var(--ink-soft);
+  max-width: 64ch;
+}
+.welcome-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-8);
+}
+.welcome-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  text-align: left;
+  padding: var(--sp-6);
+  background: var(--paper-soft);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.welcome-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--ocre);
+}
+.welcome-card--primary { background: var(--paper-deep); }
+.welcome-card-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ocre);
+}
+.welcome-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-tight);
+  color: var(--ink);
+  margin-bottom: var(--sp-2);
+}
+.welcome-card-title em { color: var(--ocre); font-style: italic; font-weight: 500; }
+.welcome-card-body {
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--ink-soft);
+  margin-bottom: var(--sp-3);
+}
+.welcome-card-cta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-mono);
+  color: var(--ocre);
+  margin-top: auto;
+}
+.welcome-roadmap {
+  margin-bottom: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--ink);
+}
+.welcome-roadmap-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: var(--sp-4);
+}
+.welcome-steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-3);
+}
+.welcome-step {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-3);
+  border-left: 2px solid var(--ocre-soft);
+}
+.welcome-step-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  color: var(--ocre);
+  letter-spacing: var(--ls-mono);
+}
+.welcome-step-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: var(--fs-lg);
+  color: var(--ink);
+}
+.welcome-step-desc {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  line-height: var(--lh-snug);
+}
+.welcome-foot {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-faint);
+  line-height: var(--lh-snug);
+  padding-top: var(--sp-4);
+  border-top: 1px dashed var(--ink-faint);
+}
+@media (max-width: 720px) {
+  .welcome-cards { grid-template-columns: 1fr; }
+}
+
+/* Pre-jornada: esconde painel e seus controles enquanto o usuário não
+ * fez nenhuma escolha. Também remove o padding-right do stage. */
+body.is-pre-journey .side-panel,
+body.is-pre-journey .side-panel-fab { display: none !important; }
+@media (min-width: 1101px) {
+  body.is-pre-journey .stage { padding-right: 48px; }
+}
+
 /* ── Side panel · síntese ao vivo ───────────────────────────────────────
  * Fixed à direita, atravessa todos os steps do wizard. Mostra custo,
  * geometria, peso e cargas atualizando em tempo real.
