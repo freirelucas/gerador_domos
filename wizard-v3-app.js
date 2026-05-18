@@ -23,6 +23,7 @@ import { initGlossarioPopover } from './glossario.js';
 import { renderStep1, renderStep3, renderStep4 } from './wizard-steps.js';
 import { renderStep5, initSheetCollapse } from './wizard-dossie.js';
 import { mountSidePanel, refreshSidePanel } from './wizard-side-panel.js';
+import { renderWelcome } from './wizard-welcome.js';
 import { renderStep2V3 } from './wizard-v3-step2.js';
 import { appendDossieExtras, appendStep1Benefits } from './wizard-v3-extras.js';
 import { appendStep1Galeria } from './wizard-v3-galeria.js';
@@ -34,7 +35,7 @@ const ALL_COVERINGS = [...COVERINGS, ...MANTIQUEIRA_COVERINGS];
 // Incremente SCHEMA_VERSION sempre que mudar a FORMA de DEFAULTS (novos
 // campos, rename, remoção). A migração é não-incremental: estados antigos
 // são resetados para DEFAULTS. O usuário só perde o wizard em andamento.
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 /**
  * @typedef {Object} DomeState
@@ -82,6 +83,8 @@ const DEFAULTS = {
     diarioChecks: {},         // map "d2:0" -> bool
     diarioNotes: {},          // map "d2" -> string
     dossieClosed: ['s-origem'],  // IDs de <section class="sheet"> fechadas
+    welcomeSeen: false,       // true após dismissar a tela de abertura
+    touched: false,           // true após primeira interação real do usuário
   },
   // Comparação A/B opcional. null = modo single-projeto (default).
   // Quando ativo: { A: snapshot, B: snapshot }, activeVariante: 'A' | 'B'.
@@ -109,7 +112,14 @@ function deepMerge(target, src) {
   }
   return target;
 }
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function persistRaw() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+// saveState marca `touched=true` automaticamente após o welcome ser
+// dismissado. Handlers da UI chamam esta versão; a tela de abertura
+// usa `persistRaw` pra não disparar o touched antes da hora.
+function saveState() {
+  if (state.v3.welcomeSeen && !state.v3.touched) state.v3.touched = true;
+  persistRaw();
+}
 
 let state = loadState();
 
@@ -772,7 +782,7 @@ function peekOtherVariant() {
 
 // ─── Hub API ──────────────────────────────────────────────────────────────
 const api = {
-  state, saveState, computeDome, attachCanvas,
+  state, saveState, persistRaw, computeDome, attachCanvas,
   setHighlight(t) { highlightedType = t; if (currentDome) buildSceneFromDome(currentDome); },
   getDome: () => currentDome,
   goToStep, render: () => render(),
@@ -804,7 +814,10 @@ function render() {
   wrap.className = 'step-page';
   stage.appendChild(wrap);
 
-  if (state.step === 1) {
+  if (state.step === 1 && !state.v3.welcomeSeen) {
+    renderWelcome(wrap, api);
+  }
+  else if (state.step === 1) {
     renderStep1(wrap, api);
     appendStep1Benefits(wrap, api);
     appendStep1Galeria(wrap, api);
