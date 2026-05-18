@@ -1196,7 +1196,9 @@ table.spec tbody tr:hover { background: var(--paper-soft); }
 }
 
 /* Responsive */
-@media (max-width: 1100px) {
+/* (placeholder histórico: havia um @media de max-width 1100px vazio aqui
+ *  com chave aberta nunca fechada. O parser engolia tudo até o final do
+ *  arquivo, quebrando estilos do .side-panel no desktop. Removido.) */
 
 /* ─── Glossário · termos com tooltip ──────────────────────────────────────── */
 .term-link {
