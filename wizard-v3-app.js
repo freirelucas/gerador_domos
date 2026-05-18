@@ -22,6 +22,7 @@ import { FLOOR_SYSTEMS, MANTIQUEIRA_COVERINGS, validateStructure } from './extra
 import { initGlossarioPopover } from './glossario.js';
 import { renderStep1, renderStep3, renderStep4 } from './wizard-steps.js';
 import { renderStep5, initSheetCollapse } from './wizard-dossie.js';
+import { mountSidePanel, refreshSidePanel } from './wizard-side-panel.js';
 import { renderStep2V3 } from './wizard-v3-step2.js';
 import { appendDossieExtras, appendStep1Benefits } from './wizard-v3-extras.js';
 import { appendStep1Galeria } from './wizard-v3-galeria.js';
@@ -33,7 +34,7 @@ const ALL_COVERINGS = [...COVERINGS, ...MANTIQUEIRA_COVERINGS];
 // Incremente SCHEMA_VERSION sempre que mudar a FORMA de DEFAULTS (novos
 // campos, rename, remoção). A migração é não-incremental: estados antigos
 // são resetados para DEFAULTS. O usuário só perde o wizard em andamento.
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 /**
  * @typedef {Object} DomeState
@@ -82,6 +83,10 @@ const DEFAULTS = {
     diarioNotes: {},          // map "d2" -> string
     dossieClosed: ['s-origem'],  // IDs de <section class="sheet"> fechadas
   },
+  // Comparação A/B opcional. null = modo single-projeto (default).
+  // Quando ativo: { A: snapshot, B: snapshot }, activeVariante: 'A' | 'B'.
+  variantes: null,
+  activeVariante: null,
 };
 const STORAGE_KEY = 'dome_wizard_state_v3';
 function loadState() {
@@ -667,7 +672,15 @@ function renderStepper() {
     nav.appendChild(btn);
   }
 }
-function goToStep(n) { state.step = Math.max(1, Math.min(5, n)); saveState(); render(); }
+function goToStep(n) {
+  state.step = Math.max(1, Math.min(5, n));
+  saveState();
+  render();
+  // Reposiciona câmera só ao trocar de etapa (não a cada slider/clique
+  // dentro de uma etapa) — preserva a vista 3D que o usuário ajustou.
+  applyViewMode(state.v3.viewMode);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 function renderFootbar() {
   const summary = document.getElementById('footbar-summary');
   const chips = [];
@@ -694,6 +707,69 @@ function renderFootbar() {
   next.textContent = state.step === 5 ? 'imprimir / exportar →' : 'avançar →';
 }
 
+// ─── Comparação A/B (variantes) ──────────────────────────────────────────
+// Os "slices" comparados são programa, forma, aberturas, sistemas, riser.
+// Tudo dentro de state.v3 (tema, vistas, diário, etc.) NÃO entra na compare.
+const VARIANT_SLICES = ['programa', 'forma', 'aberturas', 'sistemas', 'riser'];
+
+function snapshotActiveSlices() {
+  const snap = {};
+  for (const k of VARIANT_SLICES) snap[k] = structuredClone(state[k]);
+  return snap;
+}
+
+function restoreSlices(snap) {
+  for (const k of VARIANT_SLICES) {
+    if (snap[k] !== undefined) state[k] = structuredClone(snap[k]);
+  }
+}
+
+function enableCompare() {
+  const A = snapshotActiveSlices();
+  state.variantes = { A, B: structuredClone(A) };
+  state.activeVariante = 'A';
+  saveState();
+}
+
+function switchVariante(id) {
+  if (!state.variantes || !state.variantes[id]) return;
+  // Salva o que está ativo agora no slot da variante atual.
+  state.variantes[state.activeVariante] = snapshotActiveSlices();
+  state.activeVariante = id;
+  restoreSlices(state.variantes[id]);
+  saveState();
+  render();
+}
+
+function disableCompare() {
+  // Mantém o que está ativo agora; descarta a outra variante.
+  state.variantes = null;
+  state.activeVariante = null;
+  saveState();
+  refreshSidePanel(api);
+}
+
+/**
+ * Calcula métricas da variante NÃO ativa (read-only, sem mutar state).
+ * Para o side panel mostrar A/B lado a lado.
+ */
+function peekOtherVariant() {
+  if (!state.variantes || !state.activeVariante) return null;
+  const otherId = state.activeVariante === 'A' ? 'B' : 'A';
+  const snap = state.variantes[otherId];
+  if (!snap) return null;
+  // Monta um "state-like" só pros campos lidos pelo synthesis.
+  const fakeState = { ...state };
+  for (const k of VARIANT_SLICES) fakeState[k] = snap[k];
+  // Reconstrói o dome a partir dos parâmetros da outra variante.
+  const otherDome = buildDome({
+    freq: snap.forma.freq,
+    truncation: snap.forma.truncamento,
+    radius: snap.forma.diametro / 2,
+  });
+  return { id: otherId, state: fakeState, dome: otherDome };
+}
+
 // ─── Hub API ──────────────────────────────────────────────────────────────
 const api = {
   state, saveState, computeDome, attachCanvas,
@@ -710,6 +786,8 @@ const api = {
     REGIOES, LOJAS,
   },
   helpers: { programaArea, suggestDiameter, pricePerStruct, validateStructure },
+  // Comparação A/B
+  enableCompare, disableCompare, switchVariante, peekOtherVariant,
 };
 window.__domeApi = api;
 
@@ -718,7 +796,6 @@ initGlossarioPopover();
 // ─── Render principal ─────────────────────────────────────────────────────
 function render() {
   computeDome();
-  applyViewMode(state.v3.viewMode);
   applySunHour(state.v3.sol);
   renderStepper();
   const stage = document.getElementById('stage');
@@ -743,7 +820,7 @@ function render() {
 
   renderFootbar();
   saveState();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  refreshSidePanel(api);
 }
 
 // ─── Tweaks panel ─────────────────────────────────────────────────────────
@@ -902,4 +979,5 @@ document.getElementById('btn-reset').addEventListener('click', () => {
 // Boot
 applyTheme(state.v3.tema);
 initTweaks();
+mountSidePanel();
 render();
