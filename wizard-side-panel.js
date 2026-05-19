@@ -55,7 +55,10 @@ export function refreshSidePanel(api) {
   // ── Visibility · esconde o painel até o usuário ter interagido ──
   // welcomeSeen=false → ainda na tela de abertura, panel some.
   // touched=false → "começou do zero", ainda não escolheu nada.
-  const shouldShow = api.state.v3.welcomeSeen && api.state.v3.touched;
+  // funilAtivo=true → usuário está no recomendador, painel não atrapalha.
+  const shouldShow = api.state.v3.welcomeSeen
+    && api.state.v3.touched
+    && !api.state.v3.funilAtivo;
   document.body.classList.toggle('is-pre-journey', !shouldShow);
   if (!shouldShow) {
     // Limpa o conteúdo só pra não acumular DOM atrás.
