@@ -24,6 +24,8 @@ import { renderStep1, renderStep3, renderStep4 } from './wizard-steps.js';
 import { renderStep5, initSheetCollapse } from './wizard-dossie.js';
 import { mountSidePanel, refreshSidePanel } from './wizard-side-panel.js';
 import { renderWelcome } from './wizard-welcome.js';
+import { renderFunil, startFunil, resetFunil } from './wizard-funil.js';
+import { bundleSelo } from './bundles.js';
 import { renderStep2V3 } from './wizard-v3-step2.js';
 import { appendDossieExtras, appendStep1Benefits } from './wizard-v3-extras.js';
 import { appendStep1Galeria } from './wizard-v3-galeria.js';
@@ -35,7 +37,7 @@ const ALL_COVERINGS = [...COVERINGS, ...MANTIQUEIRA_COVERINGS];
 // Incremente SCHEMA_VERSION sempre que mudar a FORMA de DEFAULTS (novos
 // campos, rename, remoção). A migração é não-incremental: estados antigos
 // são resetados para DEFAULTS. O usuário só perde o wizard em andamento.
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
 
 /**
  * @typedef {Object} DomeState
@@ -85,6 +87,9 @@ const DEFAULTS = {
     dossieClosed: ['s-origem'],  // IDs de <section class="sheet"> fechadas
     welcomeSeen: false,       // true após dismissar a tela de abertura
     touched: false,           // true após primeira interação real do usuário
+    funilAtivo: false,        // true enquanto o usuário está no recomendador
+    funilProgress: null,      // { step:1-4, funcao, estilo, regiao } — persiste mid-funil
+    funilEscolha: null,       // { funcao, estilo, regiao, bundleId, cenarioId } — selo após confirmação
   },
   // Comparação A/B opcional. null = modo single-projeto (default).
   // Quando ativo: { A: snapshot, B: snapshot }, activeVariante: 'A' | 'B'.
@@ -798,6 +803,8 @@ const api = {
   helpers: { programaArea, suggestDiameter, pricePerStruct, validateStructure },
   // Comparação A/B
   enableCompare, disableCompare, switchVariante, peekOtherVariant,
+  // Recomendador (funil)
+  startFunil: () => { resetFunil(api); startFunil(api); },
 };
 window.__domeApi = api;
 
@@ -810,11 +817,37 @@ function render() {
   renderStepper();
   const stage = document.getElementById('stage');
   stage.innerHTML = '';
+
+  // Selo discreto "via funil · {função · estilo · região}" no topo do wizard
+  // sempre que o usuário confirmou uma escolha no recomendador. Click reabre
+  // o funil retomando a combinação confirmada (resetFunil + pre-set).
+  if (state.v3.funilEscolha && !state.v3.funilAtivo && state.v3.welcomeSeen) {
+    const selo = bundleSelo(state.v3.funilEscolha);
+    if (selo) {
+      const banner = document.createElement('button');
+      banner.type = 'button';
+      banner.className = 'funil-selo';
+      banner.setAttribute('aria-label', `Projeto via recomendador: ${selo}. Clique para reabrir.`);
+      banner.innerHTML = `<span class="funil-selo-tag">via recomendador</span> <span class="funil-selo-text">${selo}</span> <span class="funil-selo-cta">reabrir →</span>`;
+      banner.onclick = () => {
+        // Pre-popula o progresso com a escolha atual pra retomar na tela 4
+        state.v3.funilProgress = { step: 4, ...state.v3.funilEscolha };
+        state.v3.funilAtivo = true;
+        persistRaw();
+        render();
+      };
+      stage.appendChild(banner);
+    }
+  }
+
   const wrap = document.createElement('div');
   wrap.className = 'step-page';
   stage.appendChild(wrap);
 
-  if (state.step === 1 && !state.v3.welcomeSeen) {
+  if (state.v3.funilAtivo) {
+    renderFunil(wrap, api);
+  }
+  else if (state.step === 1 && !state.v3.welcomeSeen) {
     renderWelcome(wrap, api);
   }
   else if (state.step === 1) {
@@ -865,8 +898,23 @@ function initTweaks() {
         <button data-val="compact">compacto</button>
       </div>
     </div>
+    <div class="tweak-row tweak-row--action">
+      <button id="tweak-reabrir-funil" class="tweak-link" type="button">
+        <span class="tweak-link-label">reabrir recomendador</span>
+        <span class="tweak-link-sub">3 perguntas pra montar um novo bundle</span>
+      </button>
+    </div>
   `;
   document.body.appendChild(panel);
+  const reabrirBtn = panel.querySelector('#tweak-reabrir-funil');
+  if (reabrirBtn) {
+    reabrirBtn.onclick = () => {
+      panel.classList.remove('is-open');
+      fab.setAttribute('aria-expanded', 'false');
+      resetFunil(api);
+      startFunil(api);
+    };
+  }
 
   const themes = [
     { id: 'cerrado', name: 'cerrado', preview: 'background:#efe6cf' },

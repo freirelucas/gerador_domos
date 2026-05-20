@@ -1,16 +1,17 @@
 // wizard-welcome.js — Tela de abertura.
 //
-// Aparece quando state.v3.welcomeSeen === false. Substitui o conteúdo da
-// Etapa 1 com uma intro + duas chamadas pra ação:
-//   - "começar de um exemplo": mantém DEFAULTS pré-preenchidos.
-//   - "começar do zero": limpa programa (cenário/módulos/clima), state
-//     vira "untouched" e o painel de síntese fica oculto até o usuário
-//     fazer alguma escolha.
+// Aparece quando state.v3.welcomeSeen === false && !funilAtivo. Três caminhos:
+//   - "começar do zero": limpa programa; painel de síntese oculto até o
+//     usuário fazer uma escolha.
+//   - "recomendar um começo" (destaque): abre o funil de 3 perguntas
+//     (wizard-funil.js) que monta um bundle internamente compatível.
+//   - "usar um exemplo": carrega DEFAULTS (glamping casal pré-preenchido).
 //
-// Visível só na primeira visita. Após qualquer botão, welcomeSeen=true e
-// o usuário nunca mais vê esta tela (a menos que limpe localStorage).
+// A welcomeSeen vira true após "do zero" ou "usar exemplo"; o funil só marca
+// quando o usuário confirma na tela de síntese (cancelar funil volta aqui).
 
 import { el } from './dom-helpers.js';
+import { startFunil, resetFunil } from './wizard-funil.js';
 
 /**
  * @param {HTMLElement} host  div.step-page onde o conteúdo é injetado
@@ -30,20 +31,8 @@ export function renderWelcome(host, api) {
   ]));
 
   // ── Cards de chamada ────────────────────────────────────────────
-  wrap.appendChild(el('div', { class: 'welcome-cards' }, [
-    el('button', {
-      type: 'button',
-      class: 'welcome-card welcome-card--primary',
-      'aria-label': 'Começar com o exemplo padrão · glamping para um casal',
-      onclick: () => startWithExample(api),
-    }, [
-      el('div', { class: 'welcome-card-eyebrow' }, 'caminho rápido'),
-      el('div', { class: 'welcome-card-title', html: 'começar de um <em>exemplo</em>' }),
-      el('div', { class: 'welcome-card-body' },
-        'Carrega um glamping para um casal (Ø 5,5 m · 3v · ⅝ domo) pré-configurado. ' +
-        'Bom pra ver o app todo funcionando antes de começar o seu projeto real.'),
-      el('div', { class: 'welcome-card-cta' }, 'usar este exemplo →'),
-    ]),
+  // 3 caminhos: começar do zero · recomendar (funil) [destaque] · usar exemplo
+  wrap.appendChild(el('div', { class: 'welcome-cards welcome-cards--3' }, [
     el('button', {
       type: 'button',
       class: 'welcome-card',
@@ -53,9 +42,35 @@ export function renderWelcome(host, api) {
       el('div', { class: 'welcome-card-eyebrow' }, 'caminho aberto'),
       el('div', { class: 'welcome-card-title', html: 'começar <em>do zero</em>' }),
       el('div', { class: 'welcome-card-body' },
-        'Você escolhe cada coisa. Nada pré-selecionado. O painel de síntese (custo, peso, breakdown) ' +
-        'aparece depois da sua primeira escolha, pra não atropelar o pensamento.'),
+        'Você escolhe cada coisa. Nada pré-selecionado. O painel de síntese ' +
+        'aparece depois da sua primeira escolha.'),
       el('div', { class: 'welcome-card-cta' }, 'partir em branco →'),
+    ]),
+    el('button', {
+      type: 'button',
+      class: 'welcome-card welcome-card--primary welcome-card--hero',
+      'aria-label': 'Responder 3 perguntas e receber um projeto recomendado',
+      onclick: () => startRecommender(api),
+    }, [
+      el('div', { class: 'welcome-card-eyebrow' }, 'recomendado · 3 perguntas'),
+      el('div', { class: 'welcome-card-title', html: 'recomendar um <em>começo</em>' }),
+      el('div', { class: 'welcome-card-body' },
+        'Função × estilo × região. Em 3 cliques o app monta um projeto ' +
+        'internamente compatível, com materiais que se comportam bem juntos.'),
+      el('div', { class: 'welcome-card-cta' }, 'responder 3 perguntas →'),
+    ]),
+    el('button', {
+      type: 'button',
+      class: 'welcome-card',
+      'aria-label': 'Começar com o exemplo padrão · glamping para um casal',
+      onclick: () => startWithExample(api),
+    }, [
+      el('div', { class: 'welcome-card-eyebrow' }, 'caminho rápido'),
+      el('div', { class: 'welcome-card-title', html: 'usar um <em>exemplo</em>' }),
+      el('div', { class: 'welcome-card-body' },
+        'Carrega um glamping para um casal (Ø 5,5 m · 3v · ⅝) pré-configurado. ' +
+        'Bom pra ver o app todo funcionando antes do seu projeto real.'),
+      el('div', { class: 'welcome-card-cta' }, 'usar este exemplo →'),
     ]),
   ]));
 
@@ -100,4 +115,12 @@ function startBlank(api) {
   s.programa.clima = null;
   api.persistRaw();
   api.render();
+}
+
+function startRecommender(api) {
+  // Mantém welcomeSeen=false enquanto o funil estiver ativo — se o usuário
+  // cancela o funil, volta direto pra essa tela de abertura.
+  // Limpa qualquer progresso anterior (fresh start no funil).
+  resetFunil(api);
+  startFunil(api);
 }

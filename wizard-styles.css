@@ -1567,6 +1567,21 @@ select {
   gap: var(--sp-4);
   margin-bottom: var(--sp-8);
 }
+.welcome-cards--3 {
+  /* Layout 3-cards: laterais menores, central destacada */
+  grid-template-columns: 1fr 1.2fr 1fr;
+  align-items: stretch;
+}
+.welcome-card--hero {
+  /* Card central destacado — leve elevação visual */
+  border-width: 2px;
+  border-color: var(--ocre);
+  box-shadow: var(--shadow-sm);
+}
+.welcome-card--hero:hover {
+  border-color: var(--ocre);
+  box-shadow: var(--shadow-lg);
+}
 .welcome-card {
   display: flex;
   flex-direction: column;
@@ -1672,7 +1687,512 @@ select {
   border-top: 1px dashed var(--ink-faint);
 }
 @media (max-width: 720px) {
-  .welcome-cards { grid-template-columns: 1fr; }
+  .welcome-cards,
+  .welcome-cards--3 { grid-template-columns: 1fr; }
+}
+
+/* ── Funil de onboarding (recomendador) ─────────────────────────────────
+ * Renderizado em wizard-funil.js. 4 telas: função → estilo → região →
+ * síntese. Layout vive dentro de .step-page, mas se centraliza e usa
+ * os mesmos tokens da .welcome — mesma família visual.
+ */
+.funil {
+  max-width: 880px;
+  margin: var(--sp-7) auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  animation: fade var(--dur-slow) var(--ease-out) both;
+}
+.funil-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--ink);
+}
+.funil-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ocre);
+}
+.funil-dots {
+  display: flex;
+  gap: var(--sp-2);
+  justify-self: center;
+}
+.funil-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--ink);
+  background: var(--paper-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.funil-dot.is-active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.funil-dot.is-done {
+  background: var(--ocre);
+  color: var(--paper);
+  border-color: var(--ocre);
+}
+.funil-dot:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.funil-close {
+  justify-self: end;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.funil-close:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.funil-screen {
+  animation: fade var(--dur-base) var(--ease-out) both;
+}
+.funil-body { display: flex; flex-direction: column; gap: var(--sp-5); }
+.funil-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4.5vw, 48px);
+  font-weight: 500;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  color: var(--ink);
+  margin: 0;
+}
+.funil-title em { color: var(--ocre); font-style: italic; font-weight: 500; }
+.funil-lede {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--ink-soft);
+  max-width: 64ch;
+  margin: 0;
+}
+.funil-grid {
+  display: grid;
+  gap: var(--sp-3);
+}
+.funil-grid--6 { grid-template-columns: repeat(3, 1fr); }
+.funil-grid--2 { grid-template-columns: 1fr 1fr; }
+.funil-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  text-align: left;
+  padding: var(--sp-5);
+  min-height: 44px;
+  background: var(--paper-soft);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
+}
+.funil-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--ocre);
+}
+.funil-card.is-active {
+  border-color: var(--ocre);
+  border-width: 2px;
+  background: var(--paper-deep);
+  padding: calc(var(--sp-5) - 1px);
+  box-shadow: var(--shadow-md);
+}
+.funil-card-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+.funil-card-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ocre);
+}
+.funil-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-xl);
+  line-height: var(--lh-tight);
+  color: var(--ink);
+}
+.funil-card-title--lg { font-size: var(--fs-2xl); }
+.funil-card-desc {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+  line-height: var(--lh-snug);
+}
+.funil-card-exemplo,
+.funil-card-cidades,
+.funil-card-metricas {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-faint);
+}
+.funil-card-pitch {
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--ink-soft);
+  margin: 0;
+}
+.funil-card-attrs,
+.funil-card-riscos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.funil-card-attrs li,
+.funil-card-riscos li {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-soft);
+  padding-left: 14px;
+  position: relative;
+}
+.funil-card-attrs li::before,
+.funil-card-riscos li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  color: var(--ocre);
+  font-weight: bold;
+}
+.funil-card-fonte {
+  margin-top: auto;
+  padding-top: var(--sp-2);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-faint);
+  border-top: 1px dashed var(--ink-faint);
+  width: 100%;
+}
+
+/* Tela de síntese (4/4) */
+.funil-body--sintese .funil-title { margin-bottom: var(--sp-2); }
+.funil-sintese {
+  background: var(--paper-soft);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+.funil-sintese-head { display: flex; flex-direction: column; gap: var(--sp-2); }
+.funil-sintese-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ocre);
+}
+.funil-sintese-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-2xl);
+  font-weight: 500;
+  line-height: var(--lh-tight);
+  color: var(--ink);
+  margin: 0;
+}
+.funil-sintese-cenario {
+  font-size: var(--fs-md);
+  color: var(--ink-soft);
+  line-height: var(--lh-base);
+}
+.funil-sintese-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2) var(--sp-5);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--ink-faint);
+  border-bottom: 1px solid var(--ink-faint);
+}
+.funil-kv {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: baseline;
+  font-size: var(--fs-sm);
+}
+.funil-kv-k {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  min-width: 70px;
+}
+.funil-kv-v {
+  color: var(--ink);
+  font-weight: 500;
+}
+.funil-sintese-h4 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ocre);
+  margin: 0 0 var(--sp-2);
+}
+.funil-sintese-avisos-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.funil-sintese-avisos-list li {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-base);
+  color: var(--ink);
+  padding-left: var(--sp-4);
+  position: relative;
+}
+.funil-sintese-avisos-list li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: var(--ocre);
+  font-size: var(--fs-xs);
+  top: 4px;
+}
+.funil-sintese-fontes {
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--ink-faint);
+}
+.funil-sintese-fontes-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--sp-2);
+}
+.funil-sintese-fontes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.funil-sintese-fontes-list li {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+}
+.funil-sintese-fontes-list a {
+  color: var(--ocre);
+  text-decoration: underline;
+}
+.funil-sintese-ctas {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+/* Footer com CTAs e nota de honestidade */
+.funil-footer {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--ink);
+}
+.funil-spacer { display: inline-block; }
+.funil-honest {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-faint);
+  text-align: center;
+  line-height: var(--lh-snug);
+}
+.funil-cta,
+.funil-ghost {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-mono);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  min-height: 44px;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.funil-cta {
+  background: var(--ocre);
+  color: var(--paper);
+  border: 1px solid var(--ocre);
+}
+.funil-cta:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.funil-cta:disabled {
+  background: var(--ink-mist);
+  border-color: var(--ink-mist);
+  color: var(--ink-faint);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.funil-cta--primary { padding: var(--sp-3) var(--sp-7); font-size: var(--fs-md); }
+.funil-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink-faint);
+}
+.funil-ghost:hover { border-color: var(--ink); }
+
+/* Modal de fechar */
+.funil-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 18, 9, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade var(--dur-fast) var(--ease-out) both;
+}
+.funil-modal {
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  max-width: 460px;
+  width: calc(100% - var(--sp-7));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  box-shadow: var(--shadow-lg);
+}
+.funil-modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+.funil-modal-body {
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--ink-soft);
+  margin: 0;
+}
+.funil-modal-ctas { display: flex; justify-content: flex-end; gap: var(--sp-3); }
+
+/* Selo "via recomendador" no topo do wizard após conclusão */
+.funil-selo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-4);
+  margin: 0 auto var(--sp-3);
+  background: var(--paper-soft);
+  border: 1px dashed var(--ocre);
+  border-radius: var(--r-full);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-soft);
+  cursor: pointer;
+  max-width: max-content;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.funil-selo:hover {
+  background: var(--paper-deep);
+  border-style: solid;
+}
+.funil-selo-tag {
+  text-transform: uppercase;
+  color: var(--ocre);
+  letter-spacing: var(--ls-eyebrow);
+  font-size: var(--fs-eyebrow);
+}
+.funil-selo-text { color: var(--ink); }
+.funil-selo-cta { color: var(--ocre); }
+
+/* Tweak panel · link reabrir funil */
+.tweak-row--action { border-top: 1px dashed var(--ink-faint); padding-top: var(--sp-3); }
+.tweak-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: var(--sp-3);
+  background: var(--paper-soft);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.tweak-link:hover { border-color: var(--ocre); background: var(--paper-deep); }
+.tweak-link-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-sm);
+  letter-spacing: var(--ls-mono);
+  color: var(--ocre);
+}
+.tweak-link-sub {
+  font-size: var(--fs-xs);
+  color: var(--ink-soft);
+  line-height: var(--lh-snug);
+}
+
+/* Print: o funil não aparece em impressão */
+@media print {
+  .funil, .funil-selo, .funil-modal-overlay { display: none !important; }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .funil, .funil-screen, .funil-modal-overlay { animation: none; }
+  .funil-card:hover, .funil-cta:hover { transform: none; }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .funil-grid--6 { grid-template-columns: 1fr 1fr; }
+  .funil-grid--2 { grid-template-columns: 1fr; }
+  .funil-sintese-grid { grid-template-columns: 1fr; }
+  .funil-header { grid-template-columns: auto 1fr auto; }
+  .funil-eyebrow { font-size: 9px; }
+  .funil-footer { grid-template-columns: 1fr; gap: var(--sp-3); }
+  .funil-honest { order: -1; }
 }
 
 /* Pre-jornada: esconde painel e seus controles enquanto o usuário não
