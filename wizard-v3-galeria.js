@@ -340,7 +340,7 @@ export function appendStep1Galeria(wrap, api) {
       maxWidth: '60ch',
       opacity: '0.85',
     },
-    html: `Desde 1922 já se construíram mais de 300 mil domos no mundo, do tamanho de um quarto até estádios. ` +
+    html: `Desde 1922 (Bauersfeld/Zeiss) construíram-se centenas de milhares de domos no mundo, do tamanho de um quarto até estádios. ` +
           `Seu domo de <strong style="color:var(--ocre)">Ø ${FMT.m(diametroUsuario)}</strong> aparece em ocre. ` +
           `Clique em qualquer um para detalhes. Role para o lado.`,
   }));

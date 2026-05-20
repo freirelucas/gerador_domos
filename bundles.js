@@ -127,12 +127,12 @@ export const REGIOES_FUNIL = [
     label: 'Serra da Mantiqueira',
     climaDefault: 'mantiqueira',
     regiaoId: 'mantiqueira',
-    cidades: ['Campos do Jordão', 'Monte Verde', 'Visconde de Mauá', 'Itamonte'],
-    metricas: 'vento 38 m/s · chuva 120 mm/dia · neve 18 kg/m² · –6 °C a 30 °C',
+    cidades: ['Campos do Jordão', 'Monte Verde', 'Passa Quatro', 'Visconde de Mauá', 'Itamonte'],
+    metricas: 'vento 38 m/s · chuva 120 mm/dia · neve 0 (decorativa, sem carga) · –3 °C a 28 °C típicas',
     riscos: [
       'infiltração no ápice por chuva concentrada + neblina',
-      'fungo na madeira por umidade > 80 % o ano todo',
-      'geada em junho-julho — inclinação da cobertura ≥ 22°',
+      'fungo na madeira por umidade > 80 % o ano todo — tratamento antifúngico essencial',
+      'geada frequente jun-ago — protege madeira do contato direto; não impõe carga, mas pede inclinação ≥ 22° pra escoar chuva',
     ],
   },
   {
@@ -141,7 +141,7 @@ export const REGIOES_FUNIL = [
     climaDefault: 'cerrado_central',
     regiaoId: 'cerrado_central',
     cidades: ['Brasília', 'Goiânia', 'Cuiabá', 'Palmas', 'Pirenópolis'],
-    metricas: 'vento 35 m/s · chuva 95 mm/dia · neve 0 · –2 °C a 42 °C',
+    metricas: 'vento 35 m/s · chuva 95 mm/dia · neve 0 · –2 °C a 42 °C típicas',
     riscos: [
       'UV intensa o ano todo — membranas precisam de manutenção semestral',
       'ressecamento da madeira na seca jul-set',

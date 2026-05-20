@@ -18,6 +18,7 @@ import {
   STRUCTURE_MATERIALS, HUB_CONNECTORS, COVERINGS, FOUNDATIONS,
 } from '../materials-v2.js';
 import { MANTIQUEIRA_COVERINGS } from '../extras.js';
+import { REGIOES } from '../regiao-cargas.js';
 
 const ALL_COVERINGS = [...COVERINGS, ...MANTIQUEIRA_COVERINGS];
 
@@ -156,4 +157,42 @@ test('bundleSelo: gera label legível para combinações válidas', () => {
 
 test('bundleSelo: retorna null para combinações inválidas', () => {
   assert.equal(bundleSelo({ funcao: 'X', estilo: 'Y', regiao: 'Z' }), null);
+});
+
+// ── Anti-regressão factual ───────────────────────────────────────────────
+// Acionado por revisão factual de mai/2026: o app afirmava 18 kg/m² de neve
+// na Mantiqueira e 8 kg/m² no Pampa. Brasil inteiro tem carga de neve
+// estrutural = 0 conforme NBR 6120:2019 §6.4 (eventos esporádicos derretem
+// em horas, sem requisito de projeto). Se alguém reintroduzir neve > 0
+// pra alguma região brasileira no futuro, este teste pega.
+
+test('regiao-cargas: nenhuma região brasileira tem carga de neve estrutural', () => {
+  for (const r of REGIOES) {
+    assert.equal(r.neve_kgm2, 0,
+      `${r.label}: neve estrutural deve ser 0 — Brasil não tem carga de neve de projeto per NBR 6120 §6.4. ` +
+      `Eventos de neve em altitude (Mantiqueira, Pampa) são esporádicos e decorativos, sem requisito estrutural.`);
+  }
+});
+
+test('bundles + regiao-cargas: V0 do vento bate entre as duas fontes', () => {
+  // Cross-check: REGIOES_FUNIL.metricas é string mostrada no funil; REGIOES
+  // tem o valor numérico canônico. Se alguém atualizar um e esquecer o
+  // outro, esta asserção pega o drift silencioso.
+  for (const rf of REGIOES_FUNIL) {
+    const r = REGIOES.find((x) => x.id === rf.regiaoId);
+    assert.ok(r, `regiao-cargas precisa ter id "${rf.regiaoId}" (usado por REGIOES_FUNIL.${rf.id})`);
+    assert.ok(rf.metricas.includes(`${r.vento_v0} m/s`),
+      `${rf.id}: metricas "${rf.metricas}" deve citar V0=${r.vento_v0} m/s do regiao-cargas`);
+  }
+});
+
+test('regiao-cargas: a Mantiqueira não afirma extremos sem rótulo', () => {
+  // Mais específico: garante que a temperatura de Mantiqueira não volta
+  // a ser apresentada como [-6, 30] "extrema" — o recorde histórico tem
+  // que ficar separado da faixa típica de projeto.
+  const m = REGIOES.find((r) => r.id === 'mantiqueira');
+  assert.ok(m, 'mantiqueira presente');
+  assert.ok(m.temp_minmax_tipica_c, 'mantiqueira deve ter temp_minmax_tipica_c (faixa de projeto)');
+  assert.ok(m.temp_minmax_tipica_c[0] >= -5,
+    `mín. típica Mantiqueira ${m.temp_minmax_tipica_c[0]} parece extremo histórico (–6 °C foi a alegação que motivou esta correção)`);
 });
