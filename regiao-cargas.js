@@ -1,6 +1,24 @@
-// regiao-cargas.js — Cargas de vento, neve e referência de cidades por região
-// Fontes: NBR 6123 (vento), NBR 6120 (cargas variáveis), INMET (mapa de ventos),
-// CB-ABNT 6123 anexo A. Para neve, NBR 14762:2010 (estruturas em aço).
+// regiao-cargas.js — Cargas de vento e referência de cidades por região
+//
+// Fontes:
+//   - NBR 6123:2013 (forças devidas ao vento em edificações)
+//   - NBR 6120:2019 §6.4 (ações para o cálculo de estruturas · valores raros)
+//   - INMET (séries históricas de temperatura e chuva intensa)
+//   - Hoerner, Fluid-Dynamic Drag, 1965 (coef. de arrasto Ca de esfera/domo)
+//
+// Nota importante sobre neve: o Brasil não tem carga de neve estrutural
+// significativa per NBR 6120. Eventos de neve em altitude (Mantiqueira,
+// Pampa, Sul) são esporádicos e decorativos — derretem em horas, sem
+// requisito de projeto. Geadas são frequentes em algumas regiões mas
+// não impõem carga estrutural; impactam apenas durabilidade do material.
+// Por isso `neve_kgm2 = 0` em todas as regiões — flag preservada na
+// estrutura pra eventual expansão futura (ex.: Andes, instalações
+// científicas em altitude muito alta), não pra Brasil continental.
+//
+// Temperaturas: o par [min, max] em `temp_minmax_tipica_c` representa
+// faixa típica anual (inverno-verão). Recordes históricos extremos, quando
+// disponíveis, vivem em `temp_recorde_historico_c` com nota da fonte —
+// ex.: Mantiqueira recorde –7,4 °C em Campos do Jordão / 1957 (INMET).
 
 export const REGIOES = [
   {
@@ -9,9 +27,10 @@ export const REGIOES = [
     cidades: ['Brasília', 'Goiânia', 'Cuiabá', 'Palmas', 'Pirenópolis'],
     vento_v0: 35,         // m/s — velocidade básica NBR 6123 (V0 a 10 m, T=50 anos)
     vento_referencia: 'NBR 6123 zona 1 — interior do BR-Central',
-    neve_kgm2: 0,
+    neve_kgm2: 0,         // sem carga estrutural de neve no Brasil (NBR 6120 §6.4)
     chuva_mm_dia: 95,     // chuva intensa típica (24h, T=10 anos)
-    temp_extrema_c: [-2, 42],
+    temp_minmax_tipica_c: [-2, 42],
+    temp_recorde_historico_c: [-1.6, 41.3],  // Brasília 2000 / Cuiabá 2020 (INMET)
     sismo: 'baixa',
     observ: 'Estação seca jul-set: vento NE pode levantar lonas mal ancoradas. Ancoragem ≥ 350 N por hub do anel inferior.',
   },
@@ -23,21 +42,22 @@ export const REGIOES = [
     vento_referencia: 'NBR 6123 zona 2 — costa atlântica sul/sudeste',
     neve_kgm2: 0,
     chuva_mm_dia: 140,
-    temp_extrema_c: [8, 40],
+    temp_minmax_tipica_c: [8, 40],
     sismo: 'baixa',
     observ: 'Brisa marítima carrega sal: prefira aço galvanizado a frio ou inox para hubs. Lonas com proteção UV obrigatória.',
   },
   {
     id: 'mantiqueira',
     label: 'Serra da Mantiqueira',
-    cidades: ['Campos do Jordão', 'Monte Verde', 'Visconde de Mauá', 'Itamonte'],
+    cidades: ['Campos do Jordão', 'Monte Verde', 'Visconde de Mauá', 'Itamonte', 'Passa Quatro'],
     vento_v0: 38,
     vento_referencia: 'NBR 6123 zona 1 — altitude > 1500 m',
-    neve_kgm2: 18,        // geada pesada e neve ocasional — carga estática
+    neve_kgm2: 0,         // eventos de neve esporádicos (5–10 anos), decorativos — sem requisito estrutural per NBR 6120
     chuva_mm_dia: 120,
-    temp_extrema_c: [-6, 30],
+    temp_minmax_tipica_c: [-3, 28],            // faixa típica anual (inverno-verão)
+    temp_recorde_historico_c: [-7.4, 30.2],    // Campos do Jordão 1957 / 2014 (INMET)
     sismo: 'baixa',
-    observ: 'Geadas em junho-julho. Inclinação da cobertura ≥ 22° para escoar gelo. Pé-direito útil maior é vantagem térmica.',
+    observ: 'Geadas frequentes jun-ago (sem carga estrutural — só durabilidade da madeira). Eventos de neve esporádicos a cada 5–10 anos, decorativos. Umidade > 80 % o ano todo: tratamento antifúngico obrigatório. Inclinação ≥ 22° escoa chuva concentrada.',
   },
   {
     id: 'caatinga',
@@ -47,7 +67,7 @@ export const REGIOES = [
     vento_referencia: 'NBR 6123 zona 1 — semi-árido NE',
     neve_kgm2: 0,
     chuva_mm_dia: 70,
-    temp_extrema_c: [10, 45],
+    temp_minmax_tipica_c: [10, 45],
     sismo: 'baixa-moderada',
     observ: 'Radiação solar extrema. Cobertura clara, ventilação cruzada e cúpula zenital são essenciais. Madeira da região: aroeira, angico.',
   },
@@ -59,7 +79,7 @@ export const REGIOES = [
     vento_referencia: 'NBR 6123 zona 1 — Amazônia ocidental',
     neve_kgm2: 0,
     chuva_mm_dia: 180,
-    temp_extrema_c: [18, 38],
+    temp_minmax_tipica_c: [18, 38],
     sismo: 'baixa',
     observ: 'Umidade > 85%. Madeira não-tratada apodrece em <2 anos. Use jatobá-folha-miúda ou bambu autoclavado. Cobertura impermeável obrigatória.',
   },
@@ -69,11 +89,11 @@ export const REGIOES = [
     cidades: ['Bagé', 'Pelotas', 'Santana do Livramento', 'São Gabriel'],
     vento_v0: 50,         // ventos minuano podem chegar a 100 km/h
     vento_referencia: 'NBR 6123 zona 3 — região sul, ventos minuano',
-    neve_kgm2: 8,
+    neve_kgm2: 0,         // neve esporádica decorativa (Bagé recorde 1965) — sem requisito estrutural
     chuva_mm_dia: 110,
-    temp_extrema_c: [-5, 38],
+    temp_minmax_tipica_c: [-5, 38],
     sismo: 'baixa',
-    observ: 'Minuano sopra forte de SO. Orientar porta principal para NE. Ancoragem mínima 600 N por hub. Cobertura com costuras duplas.',
+    observ: 'Minuano (SO) é o crítico — base 50 m/s da NBR 6123 zona 3. Orientar porta principal para NE; ancoragem ≥ 600 N por hub. Geadas frequentes, neve esporádica decorativa (sem requisito estrutural).',
   },
 ];
 
@@ -94,8 +114,12 @@ export function cargaVento(regiao, altura_m = 3.5) {
   };
 }
 
-// Carga total na casca + tração por hub do anel inferior (simplificado)
-// Força de arrasto: F = Ca · q · A  (Ca = 0.65 para domo geodésico ⅝, ABNT/ASCE 7-22)
+// Carga total na casca + tração por hub do anel inferior (simplificado).
+// Força de arrasto: F = Ca · q · A.
+// Ca = 0.65: aproximação engenheiral para cúpula ⅝ em fluxo turbulento.
+// Referência: Hoerner, Fluid-Dynamic Drag, 1965, cap.4 (esfera/casca esférica).
+// O valor real flutua entre 0.5 e 0.8 conforme ângulo de incidência —
+// 0.65 é a média defensável para uso DIY/pré-dimensionamento.
 export function cargaTotalDomo(regiao, dome, alturaTotal_m) {
   const v = cargaVento(regiao, alturaTotal_m / 2);
   const Ca = 0.65;

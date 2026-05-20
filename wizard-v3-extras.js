@@ -85,9 +85,9 @@ export function appendStep1Benefits(wrap, api) {
       desc: 'Forma esférica distribui cargas em todas as direções. Polo Sul, Patagônia.',
     },
     {
-      icon: '◐', n: '300k', unit: 'mundo',
+      icon: '◐', n: '300k+', unit: 'mundo (est.)',
       title: 'História provada',
-      desc: 'Construções desde 1922 (Bauersfeld/Zeiss). Hoje há mais de 300 mil em todo o mundo.',
+      desc: 'Construções desde 1922 (Bauersfeld/Zeiss). Estimativa popular: centenas de milhares no mundo — cifra de 300 mil é a mais citada, atribuída ao próprio Buckminster Fuller em entrevistas dos anos 1980. Sem censo oficial.',
     },
     {
       icon: '◌', n: '+30%', unit: 'mais rápido',
@@ -195,7 +195,7 @@ function renderOrigemSheet() {
   sheet.appendChild(el('div', { class: 'sheet-head' }, [
     el('div', { class: 'sheet-tag' }, '16b'),
     el('h2', { html: '<em>Origem</em> · timeline dos domos geodésicos' }),
-    el('div', { class: 'sheet-meta' }, '1922 → hoje · 300.000+ no mundo'),
+    el('div', { class: 'sheet-meta' }, '1922 → hoje · centenas de milhares no mundo (est. Fuller / BFI)'),
   ]));
 
   sheet.appendChild(el('div', { class: 'memorial', style: { fontSize: '13.5px' } }, [
@@ -277,8 +277,8 @@ function renderOrigemSheet() {
     },
     {
       year: 'hoje',
-      title: '300.000+ domos no mundo',
-      desc: 'De Norte a Sul, de Leste a Oeste — incluindo áreas remotas como Polos. Estações de radar, observatórios, planetários, residências, estufas, hospedagens. Este app: o domo nº 300.001 espera você.',
+      title: 'centenas de milhares no mundo',
+      desc: 'Estimativa popular de 300.000+ é atribuída a Buckminster Fuller (entrevistas anos 1980) e replicada por domerama.com e similares — não há censo oficial. A ordem de grandeza é defensável dado o número de fabricantes industriais (Pacific Domes, Geodesic Tents, Natural Spaces) somado a DIY desde Drop City (1965). Estações de radar, observatórios, planetários, residências, estufas, hospedagens — em todos os continentes. Este app: o seu próximo.',
     },
   ];
 
@@ -344,7 +344,7 @@ function renderCargasSheet(state, dome) {
   sheet.appendChild(el('div', { class: 'sheet-head' }, [
     el('div', { class: 'sheet-tag' }, '17'),
     el('h2', { html: 'Cargas <em>· vento e neve</em>' }),
-    el('div', { class: 'sheet-meta' }, `NBR 6123 · NBR 14762 · ${regiao.label}`),
+    el('div', { class: 'sheet-meta' }, `NBR 6123 (vento) · NBR 6120 (ações variáveis) · ${regiao.label}`),
   ]));
 
   // Selector de região
